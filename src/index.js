@@ -1,9 +1,5 @@
 import * as jserror from './jserror.js';
-import $ from 'jquery';
 import 'timing.js';
+import './collect.js';
 
-const iuapInsight = () => {
-
-}
-
-export default iuapInsight
+jserror();
