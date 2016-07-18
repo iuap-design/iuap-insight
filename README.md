@@ -12,7 +12,7 @@
 
 在页面中做如下配置：
 ```
-var uis = new UIS();
+window.uis = new UIS();
 uis.setOption("trackerUrl", 'http://172.20.13.81:8080/browserInsight/collect');
 uis.setOption("userId","testUserId");
 uis.setOption("siteId","mysite1");
