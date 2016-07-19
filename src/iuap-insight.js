@@ -336,18 +336,15 @@ UISEvent = function(uis) {
     this.set('res', window.screen.width + ' * ' +  window.screen.height);
     this.set('res_x', window.screen.width);
     this.set('res_y', window.screen.height);
-    // if (campaignNameDetected)
-    //     this.set('_rcn', encodeURIComponent(campaignNameDetected));
-    // if (campaignKeywordDetected)
-    //     this.set('_rck', encodeURIComponent(campaignKeywordDetected));
-    // this.set('_rck', referralTs);
-    // this.set('_viewts', cookieVisitorIdValues.lastVisitTs);
-    // if (cookieVisitorIdValues.lastEcommerceOrderTs)
-    //     this.set('_ects', cookieVisitorIdValues.lastEcommerceOrderTs);
-    // referralUrl
-    // if (charSet)
-    //     this.set('cs', encodeURIComponent(charSet));
     this.set('page_title', document.title);
+    var  locationArray = uis.urlFixup(document.domain, window.location.href, uis.getReferrer());
+    var configReferrerUrl = decodeURIComponent(locationArray[2]);
+    this.set('url',window.location.href);
+    if (configReferrerUrl)
+        this.set("url_ref", configReferrerUrl);
+    this.set("host", window.location.host);
+
+
 }
 
 UISEvent.prototype = {
@@ -1188,7 +1185,7 @@ UIS.fn.clickEventHandler = function(e) {
         dom_value = targ.value;
     }
     // click.setName(dom_value);
-    click.set('click_pos', this.findPosX(targ) + ',' + this.findPosY(targ));
+    // click.set('click_pos', this.findPosX(targ) + ',' + this.findPosY(targ));
     click.set('click_text', targ.innerText);
 
 
@@ -1234,8 +1231,8 @@ UIS.fn.clickEventHandler = function(e) {
     // click.set("dom_element_x", this.findPosX(targ) + '');
     // click.set("dom_element_y", this.findPosY(targ) + '');
     // var coords = this.getCoords(e);
-    // click.set('click_x', coords.x);
-    // click.set('click_y', coords.y);
+    click.set('click_pos_x', this.findPosX(targ));
+    click.set('click_pos_y', this.findPosY(targ));
 
     // add to event queue is logging dom stream
     // if (this.getOption('trackDomStream')) {
@@ -1297,20 +1294,14 @@ UIS.fn.trackJqueryAjax = function(jq){
             var twoTime = new Date().getTime();
             var ajax_timing = twoTime - begin;
             var event = new UISEvent(self);
-            var  locationArray = self.urlFixup(document.domain, window.location.href, self.getReferrer());
-            //var locationHrefAlias = decodeURIComponent(locationArray[1]);
-            var configReferrerUrl = decodeURIComponent(locationArray[2]);
 
             event.setEventType("ajax");
             event.setAction(actionId);
-            // event.setName(txID);
             event.set('ajax_id', ajax_id);
             event.set('content_length' , clength || 0);
             event.set('ajax_tm' , ajax_timing);
 
-            event.set('url',url);
-            if (configReferrerUrl)
-                   event.set("url_ref", configReferrerUrl);
+            event.set('url_ajax',url);
             self.logEvent(event.getProperties())
         };
         return ajaxBack(setting);
@@ -1441,7 +1432,7 @@ window.onerror = function(msg,url,line,col,error){
         event.set("error_line", data.line);
         event.set("error_col", data.col);
         event.set("error_msg", data.msg);
-        uis.logEvent(event.getProperties);
+        uis.logEvent(event.getProperties());
     },0);
 
     //return true;
