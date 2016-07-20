@@ -19,6 +19,7 @@ uis.setOption("siteId","mysite1");
 uis.trackClicks();
 uis.trackRouter();
 uis.trackPageLoad();
+uis.trackError();
 uis.trackJqueryAjax($);
 ```
 
@@ -32,6 +33,7 @@ uis.trackJqueryAjax($);
 `.trackClicks()` : 监听鼠标点击   
 `.trackRouter()` : 监听路由变化  
 `.trackPageLoad()` : 监听页面加载  
+`.trackError()` : 监听页面错误
 `.trackJqueryAjax($)` : 监听jquery的ajax事件，参数为jquery对象。需要先引入jquery，才能调用此方法。
 
 注意事项：

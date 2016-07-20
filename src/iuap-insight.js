@@ -1400,40 +1400,53 @@ UIS.fn.trackPageLoad = function(){
     }
 };
 
-window.onerror = function(msg,url,line,col,error){
-    if (msg != "Script error." && !url){
-        return true;
-    }
-    setTimeout(function(){
-        var data = {};
-        col = col || (window.event && window.event.errorCharacter) || 0;
-        data.url = url;
-        data.line = line;
-        data.col = col;
-        if (!!error && !!error.stack){
-            data.msg = error.stack.toString();
-        }else if (!!arguments.callee){
-            var ext = [];
-            var f = arguments.callee.caller, c = 3;
-            while (f && (--c>0)) {
-                ext.push(f.toString());
-                if (f  === f.caller) {
-                    break;
-                }
-                f = f.caller;
-            }
-            ext = ext.join(",");
-            data.msg = ext;
+UIS.fn.log = function(params){
+    if (typeof params != 'object') return;
+    var event = new UISEvent(this);
+    for (var key in params){
+        if (key.indexOf('ext') == 0){
+            event.set(key, params[key])
         }
-        var uis = window.uis || new UIS();
-        var event = new UISEvent(uis);
-        event.setEventType("jserror");
-        event.set("error_js", data.url);
-        event.set("error_line", data.line);
-        event.set("error_col", data.col);
-        event.set("error_msg", data.msg);
-        uis.logEvent(event.getProperties());
-    },0);
-
-    //return true;
+    }
+    this.logEvent(event.getProperties());
 };
+
+UIS.fn.trackError = function(){
+    window.onerror = function(msg,url,line,col,error){
+        if (msg != "Script error." && !url){
+            return true;
+        }
+        setTimeout(function(){
+            var data = {};
+            col = col || (window.event && window.event.errorCharacter) || 0;
+            data.url = url;
+            data.line = line;
+            data.col = col;
+            if (!!error && !!error.stack){
+                data.msg = error.stack.toString();
+            }else if (!!arguments.callee){
+                var ext = [];
+                var f = arguments.callee.caller, c = 3;
+                while (f && (--c>0)) {
+                    ext.push(f.toString());
+                    if (f  === f.caller) {
+                        break;
+                    }
+                    f = f.caller;
+                }
+                ext = ext.join(",");
+                data.msg = ext;
+            }
+            var uis = window.uis || new UIS();
+            var event = new UISEvent(uis);
+            event.setEventType("jserror");
+            event.set("error_js", data.url);
+            event.set("error_line", data.line);
+            event.set("error_col", data.col);
+            event.set("error_msg", data.msg);
+            uis.logEvent(event.getProperties());
+        },0)
+        //return true;
+    };
+}
+
