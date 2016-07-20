@@ -1403,6 +1403,7 @@ UIS.fn.trackPageLoad = function(){
 UIS.fn.log = function(params){
     if (typeof params != 'object') return;
     var event = new UISEvent(this);
+    event.setEventType('custom');
     for (var key in params){
         if (key.indexOf('ext') == 0){
             event.set(key, params[key])

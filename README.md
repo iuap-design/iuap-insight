@@ -35,6 +35,8 @@ uis.trackJqueryAjax($);
 `.trackPageLoad()` : 监听页面加载  
 `.trackError()` : 监听页面错误
 `.trackJqueryAjax($)` : 监听jquery的ajax事件，参数为jquery对象。需要先引入jquery，才能调用此方法。
+`.log({ext1:'xxx',ext2:'xxx'})` : 用户自定义日志信息，开发者在需要记日志的地方调用此方法，参数只能是: ext1,ext2 ... ext5。
+
 
 注意事项：
 
