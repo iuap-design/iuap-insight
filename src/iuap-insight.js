@@ -1394,6 +1394,7 @@ UIS.fn.trackPageLoad = function(){
         event.set('t_onload', myTime.t_onload || 0);
         event.set('t_white', myTime.t_white || 0);
         event.set('t_all', myTime.t_all || 0);
+        event.set('ajax_tm' , myTime.t_all || 0);
         this.logEvent(event.getProperties());
     }else{
         setTimeout(function(){that.trackPageLoad()},400);
