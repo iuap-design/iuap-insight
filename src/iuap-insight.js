@@ -103,6 +103,7 @@
                     api.t_request = timing.responseStart - timing.requestStart; //*服务器响应时间
                     api.t_response =  timing.responseEnd - timing.responseStart; //*网页下载时间
                     api.t_paint = parseInt(api.firstPaintTime) - parseInt(startTime); //*首次渲染时间
+                    api.t_paint = api.t_paint < 0 ? 0 : api.t_paint;
                     api.t_dom =  timing.domContentLoadedEventStart - timing.domLoading; //dom ready时间（阶段）
                     api.t_domready = timing.domContentLoadedEventStart - startTime; //*dom ready时间（总和）
                     api.t_load = timing.loadEventStart - timing.domLoading; //onload时间（阶段）
