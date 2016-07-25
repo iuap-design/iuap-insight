@@ -1278,7 +1278,15 @@ UIS.fn.trackClicks = function(handler) {
 UIS.fn.trackJqueryAjax = function(jq){
     var self = this;
     var ajaxBack = jq.ajax;
-    jq.ajax = function(setting){
+    jq.ajax = function(url1, setting){
+        if ( typeof urll === "object" ) {
+            setting = urll;
+            url1 = undefined;
+        }
+
+        // Force options to be an object
+        setting = setting || {};
+
         var cb = setting.complete;
         var begin = new Date().getTime(),
             url = setting['url'];
@@ -1304,7 +1312,7 @@ UIS.fn.trackJqueryAjax = function(jq){
             event.set('url_ajax',url);
             self.logEvent(event.getProperties())
         };
-        return ajaxBack(setting);
+        return ajaxBack(url1, setting);
     }
 };
 
