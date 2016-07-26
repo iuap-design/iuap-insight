@@ -1301,7 +1301,7 @@ UIS.fn.trackJqueryAjax = function(jq){
             var clength = data.getResponseHeader("Content-Length");
             if(jq.isFunction(cb)){cb.apply(this, arguments)}
             var twoTime = new Date().getTime();
-            var ajax_timing = twoTime - begin;
+            var ajax_timing = oneTime - begin;
             var event = new UISEvent(self);
 
             event.setEventType("ajax");
