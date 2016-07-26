@@ -1280,8 +1280,8 @@ UIS.fn.trackJqueryAjax = function(jq){
     var self = this;
     var ajaxBack = jq.ajax;
     jq.ajax = function(url1, setting){
-        if ( typeof urll === "object" ) {
-            setting = urll;
+        if ( typeof url1 === "object" ) {
+            setting = url1;
             url1 = undefined;
         }
 
@@ -1290,12 +1290,17 @@ UIS.fn.trackJqueryAjax = function(jq){
 
         var cb = setting.complete;
         var begin = new Date().getTime(),
-            url = setting['url'];
+            url = setting['url'],
+	          oneTime;
         setting.beforeSend =  function(xhr){
             xhr.setRequestHeader("Action-Id", window.action_id);
         }
+      	setting.dataFilter = function(data, type){
+      		oneTime = new Date().getTime();
+      		return data;
+      	}
         setting.complete = function(data, textStatus, request){
-            var oneTime = new Date().getTime();
+            //var oneTime = new Date().getTime();
             var ajax_id = data.getResponseHeader("txID");
             var actionId = data.getResponseHeader("Action-Id");
             var clength = data.getResponseHeader("Content-Length");
@@ -1310,7 +1315,7 @@ UIS.fn.trackJqueryAjax = function(jq){
             event.set('ajax_id', ajax_id);
             event.set('content_length' , clength || 0);
             event.set('ajax_tm' , ajax_timing);
-            event.set('ajax_tm_cb' , ajax_timing_cb);
+            event.set('ajax_tm_cb',ajax_timing_cb);
 
             event.set('url_ajax',url);
             self.logEvent(event.getProperties())
@@ -1462,4 +1467,3 @@ UIS.fn.trackError = function(){
         //return true;
     };
 }
-
