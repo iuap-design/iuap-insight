@@ -18,127 +18,129 @@
      * timing.getTimes();
      **/
     window.timing = {
-            /**
-             * Outputs extended measurements using Navigation Timing API
-             * @param  Object opts Options (simple (bool) - opts out of full data view)
-             * @return Object      measurements
-             */
-            getTimes: function(opts) {
-                var performance = window.performance || window.webkitPerformance || window.msPerformance || window.mozPerformance;
+        /**
+         * Outputs extended measurements using Navigation Timing API
+         * @param  Object opts Options (simple (bool) - opts out of full data view)
+         * @return Object      measurements
+         */
+        getTimes: function(opts) {
+            var performance = window.performance || window.webkitPerformance || window.msPerformance || window.mozPerformance;
 
-                if (performance === undefined) {
-                    return false;
-                }
-
-                var timing = performance.timing;
-                var api = {};
-                opts = opts || {};
-
-                if (timing) {
-                    if(opts && !opts.simple) {
-                        for (var k in timing) {
-                            if (timing.hasOwnProperty(k)) {
-                                api[k] = timing[k];
-                            }
-                        }
-                    }
-
-
-                    // Time to first paint
-                    if (api.firstPaint === undefined) {
-                        // All times are relative times to the start time within the
-                        // same objects
-                        var firstPaint = 0;
-
-                        // Chrome
-                        if (window.chrome && window.chrome.loadTimes) {
-                            // Convert to ms
-                            firstPaint = window.chrome.loadTimes().firstPaintTime * 1000;
-                            api.firstPaintTime = firstPaint; //firstPaint - (window.chrome.loadTimes().startLoadTime*1000);
-                        }
-                        // IE
-                        else if (typeof window.performance.timing.msFirstPaint === 'number') {
-                            firstPaint = window.performance.timing.msFirstPaint;
-                            api.firstPaintTime = firstPaint //firstPaint - window.performance.timing.navigationStart;
-                        }
-                        // Firefox
-                        // This will use the first times after MozAfterPaint fires
-                        //else if (window.performance.timing.navigationStart && typeof InstallTrigger !== 'undefined') {
-                        //    api.firstPaint = window.performance.timing.navigationStart;
-                        //    api.firstPaintTime = mozFirstPaintTime - window.performance.timing.navigationStart;
-                        //}
-                        if (opts && !opts.simple) {
-                            api.firstPaint = firstPaint;
-                        }
-                    }
-
-                    // Total time from start to load
-                    api.loadTime = timing.loadEventEnd - timing.fetchStart;
-                    // Time spent constructing the DOM tree
-                    api.domReadyTime = timing.domComplete - timing.domInteractive;
-                    // Time consumed preparing the new page
-                    api.readyStart = timing.fetchStart - timing.navigationStart;
-                    // Time spent during redirection
-                    api.redirectTime = timing.redirectEnd - timing.redirectStart;
-                    // AppCache
-                    api.appcacheTime = timing.domainLookupStart - timing.fetchStart;
-                    // Time spent unloading documents
-                    api.unloadEventTime = timing.unloadEventEnd - timing.unloadEventStart;
-                    // DNS query time
-                    api.lookupDomainTime = timing.domainLookupEnd - timing.domainLookupStart;
-                    // TCP connection time
-                    api.connectTime = timing.connectEnd - timing.connectStart;
-                    // Time spent during the request
-                    api.requestTime = timing.responseEnd - timing.requestStart;
-                    // Request to completion of the DOM loading
-                    api.initDomTreeTime = timing.domInteractive - timing.responseEnd;
-                    // Load event time
-                    api.loadEventTime = timing.loadEventEnd - timing.loadEventStart;
-
-                    var startTime = timing.navigationStart || timing.fetchStart;
-                    api.t_unload =timing.unloadEventEnd - timing.unloadEventStart; //上个文档的卸载时间
-                    api.t_redirect = timing.redirectEnd - timing.redirectStart; //*重定向时间
-                    api.t_dns  = timing.domainLookupEnd - timing.domainLookupStart; //*DNS查询时间
-                    api.t_tcp =  timing.connectEnd - timing.connectStart; //*服务器连接时间
-                    api.t_request = timing.responseStart - timing.requestStart; //*服务器响应时间
-                    api.t_response =  timing.responseEnd - timing.responseStart; //*网页下载时间
-                    api.t_paint = parseInt(api.firstPaintTime) - parseInt(startTime); //*首次渲染时间
-                    api.t_paint = api.t_paint < 0 ? 0 : api.t_paint;
-                    api.t_dom =  timing.domContentLoadedEventStart - timing.domLoading; //dom ready时间（阶段）
-                    api.t_domready = timing.domContentLoadedEventStart - startTime; //*dom ready时间（总和）
-                    api.t_load = timing.loadEventStart - timing.domLoading; //onload时间（阶段）
-                    api.t_onload = timing.loadEventStart - startTime; //*onload时间（总和）
-                    api.t_white = timing.responseStart - startTime; //*白屏时间
-                    api.t_all = timing.loadEventEnd - startTime; //整个过程的时间之和
-
-
-
-                }
-
-                return api;
-            },
-            /**
-             * Uses console.table() to print a complete table of timing information
-             * @param  Object opts Options (simple (bool) - opts out of full data view)
-             */
-            printTable: function(opts) {
-                var table = {};
-                var data  = this.getTimes(opts) || {};
-                Object.keys(data).sort().forEach(function(k) {
-                    table[k] = {
-                        ms: data[k],
-                        s: +((data[k] / 1000).toFixed(2))
-                    };
-                });
-                console.table(table);
-            },
-            /**
-             * Uses console.table() to print a summary table of timing information
-             */
-            printSimpleTable: function() {
-                this.printTable({simple: true});
+            if (performance === undefined) {
+                return false;
             }
-        };
+
+            var timing = performance.timing;
+            var api = {};
+            opts = opts || {};
+
+            if (timing) {
+                if (opts && !opts.simple) {
+                    for (var k in timing) {
+                        if (timing.hasOwnProperty(k)) {
+                            api[k] = timing[k];
+                        }
+                    }
+                }
+
+
+                // Time to first paint
+                if (api.firstPaint === undefined) {
+                    // All times are relative times to the start time within the
+                    // same objects
+                    var firstPaint = 0;
+
+                    // Chrome
+                    if (window.chrome && window.chrome.loadTimes) {
+                        // Convert to ms
+                        firstPaint = window.chrome.loadTimes().firstPaintTime * 1000;
+                        api.firstPaintTime = firstPaint; //firstPaint - (window.chrome.loadTimes().startLoadTime*1000);
+                    }
+                    // IE
+                    else if (typeof window.performance.timing.msFirstPaint === 'number') {
+                        firstPaint = window.performance.timing.msFirstPaint;
+                        api.firstPaintTime = firstPaint //firstPaint - window.performance.timing.navigationStart;
+                    }
+                    // Firefox
+                    // This will use the first times after MozAfterPaint fires
+                    //else if (window.performance.timing.navigationStart && typeof InstallTrigger !== 'undefined') {
+                    //    api.firstPaint = window.performance.timing.navigationStart;
+                    //    api.firstPaintTime = mozFirstPaintTime - window.performance.timing.navigationStart;
+                    //}
+                    if (opts && !opts.simple) {
+                        api.firstPaint = firstPaint;
+                    }
+                }
+
+                // Total time from start to load
+                api.loadTime = timing.loadEventEnd - timing.fetchStart;
+                // Time spent constructing the DOM tree
+                api.domReadyTime = timing.domComplete - timing.domInteractive;
+                // Time consumed preparing the new page
+                api.readyStart = timing.fetchStart - timing.navigationStart;
+                // Time spent during redirection
+                api.redirectTime = timing.redirectEnd - timing.redirectStart;
+                // AppCache
+                api.appcacheTime = timing.domainLookupStart - timing.fetchStart;
+                // Time spent unloading documents
+                api.unloadEventTime = timing.unloadEventEnd - timing.unloadEventStart;
+                // DNS query time
+                api.lookupDomainTime = timing.domainLookupEnd - timing.domainLookupStart;
+                // TCP connection time
+                api.connectTime = timing.connectEnd - timing.connectStart;
+                // Time spent during the request
+                api.requestTime = timing.responseEnd - timing.requestStart;
+                // Request to completion of the DOM loading
+                api.initDomTreeTime = timing.domInteractive - timing.responseEnd;
+                // Load event time
+                api.loadEventTime = timing.loadEventEnd - timing.loadEventStart;
+
+                var startTime = timing.navigationStart || timing.fetchStart;
+                api.t_unload = timing.unloadEventEnd - timing.unloadEventStart; //上个文档的卸载时间
+                api.t_redirect = timing.redirectEnd - timing.redirectStart; //*重定向时间
+                api.t_dns = timing.domainLookupEnd - timing.domainLookupStart; //*DNS查询时间
+                api.t_tcp = timing.connectEnd - timing.connectStart; //*服务器连接时间
+                api.t_request = timing.responseStart - timing.requestStart; //*服务器响应时间
+                api.t_response = timing.responseEnd - timing.responseStart; //*网页下载时间
+                api.t_paint = parseInt(api.firstPaintTime) - parseInt(startTime); //*首次渲染时间
+                api.t_paint = api.t_paint < 0 ? 0 : api.t_paint;
+                api.t_dom = timing.domContentLoadedEventStart - timing.domLoading; //dom ready时间（阶段）
+                api.t_domready = timing.domContentLoadedEventStart - startTime; //*dom ready时间（总和）
+                api.t_load = timing.loadEventStart - timing.domLoading; //onload时间（阶段）
+                api.t_onload = timing.loadEventStart - startTime; //*onload时间（总和）
+                api.t_white = timing.responseStart - startTime; //*白屏时间
+                api.t_all = timing.loadEventEnd - startTime; //整个过程的时间之和
+
+
+
+            }
+
+            return api;
+        },
+        /**
+         * Uses console.table() to print a complete table of timing information
+         * @param  Object opts Options (simple (bool) - opts out of full data view)
+         */
+        printTable: function(opts) {
+            var table = {};
+            var data = this.getTimes(opts) || {};
+            Object.keys(data).sort().forEach(function(k) {
+                table[k] = {
+                    ms: data[k],
+                    s: +((data[k] / 1000).toFixed(2))
+                };
+            });
+            console.table(table);
+        },
+        /**
+         * Uses console.table() to print a summary table of timing information
+         */
+        printSimpleTable: function() {
+            this.printTable({
+                simple: true
+            });
+        }
+    };
 
 })(this);
 
@@ -165,11 +167,11 @@ function hash(str) {
     // +   jslinted by: Anthon Pang (http://piwik.org)
 
     var
-        rotate_left = function (n, s) {
+        rotate_left = function(n, s) {
             return (n << s) | (n >>> (32 - s));
         },
 
-        cvt_hex = function (val) {
+        cvt_hex = function(val) {
             var strout = '',
                 i,
                 v;
@@ -321,10 +323,10 @@ UISEvent = function(uis) {
     this.id = '';
     // this.siteId = '';
     //this.set('timestamp', Math.round(new Date().getTime() / 1000));
-    this.set('site_id',uis.getOption('siteId'));
+    this.set('site_id', uis.getOption('siteId'));
     // this.set('rec',1);
     // this.set('r',String(Math.random()).slice(2, 8));
-    this.set('client_ts',now.getTime());
+    this.set('client_ts', now.getTime());
     // this.set('url',now.getSeconds());
     // this.set('urlref',now.getSeconds());
     // this.set('s',now.getSeconds());
@@ -334,13 +336,13 @@ UISEvent = function(uis) {
     // this.set('_idts', cookieVisitorIdValues.createTs);
     // this.set('_idvc', cookieVisitorIdValues.visitCount);
     // this.set('_idn', cookieVisitorIdValues.newVisitor);
-    this.set('res', window.screen.width + ' * ' +  window.screen.height);
+    this.set('res', window.screen.width + ' * ' + window.screen.height);
     this.set('res_x', window.screen.width);
     this.set('res_y', window.screen.height);
     this.set('page_title', document.title);
-    var  locationArray = uis.urlFixup(document.domain, window.location.href, uis.getReferrer());
+    var locationArray = uis.urlFixup(document.domain, window.location.href, uis.getReferrer());
     var configReferrerUrl = decodeURIComponent(locationArray[2]);
-    this.set('url',window.location.href);
+    this.set('url', window.location.href);
     if (configReferrerUrl)
         this.set("url_ref", configReferrerUrl);
     this.set("host", window.location.host);
@@ -349,21 +351,21 @@ UISEvent = function(uis) {
 }
 
 UISEvent.prototype = {
-    get : function(name) {
-        if ( this.properties.hasOwnProperty(name) ) {
+    get: function(name) {
+        if (this.properties.hasOwnProperty(name)) {
             return this.properties[name];
         }
     },
 
-    set : function(name, value) {
+    set: function(name, value) {
         this.properties[name] = value;
     },
 
-    setEventType : function(event_type) {
+    setEventType: function(event_type) {
         this.set("type", event_type);
     },
 
-    setAction : function(action){
+    setAction: function(action) {
         this.set("action_id", action);
         window.action_id = action;
     },
@@ -376,20 +378,20 @@ UISEvent.prototype = {
     //     this.set("e_v", value)
     // },
 
-    getProperties : function() {
+    getProperties: function() {
         return this.properties;
     },
 
-    merge : function(properties) {
-        for(param in properties) {
+    merge: function(properties) {
+        for (param in properties) {
             if (properties.hasOwnProperty(param)) {
                 this.set(param, properties[param]);
             }
         }
     },
 
-    isSet : function( name ) {
-        if ( this.properties.hasOwnProperty( name ) ) {
+    isSet: function(name) {
+        if (this.properties.hasOwnProperty(name)) {
             return true;
         }
     },
@@ -401,7 +403,7 @@ UISEvent.prototype = {
             Math.random()
         ).slice(0, 16);
     },
-    loadVisitorIdCookie : function() {
+    loadVisitorIdCookie: function() {
         var now = new Date(),
             nowTs = Math.round(now.getTime() / 1000),
             idCookieName = this.uis.getCookieName('id'),
@@ -418,7 +420,7 @@ UISEvent.prototype = {
             return cookieValue;
         }
 
-        if (!visitorId){
+        if (!visitorId) {
             visitorId = this.generateRandomUuid();
             UIS.setCookie(visitorIdCookieName, visitorId)
         }
@@ -467,10 +469,10 @@ UISEvent.prototype = {
             lastEcommerceOrderTs: lastEcommerceOrderTs
         };
     },
-    getVisitorId: function () {
+    getVisitorId: function() {
         return this.getValuesFromVisitorIdCookie().uuid;
     },
-    loadReferrerAttributionCookie : function() {
+    loadReferrerAttributionCookie: function() {
         var cookie = UIS.getCookie(this.uis.getCookieName('ref'));
 
         if (cookie.length) {
@@ -495,15 +497,15 @@ UISEvent.prototype = {
 };
 
 
-var UIS = function(){
+var UIS = function() {
     this.config = {
         trackerUrl: '',
-        getRequestCharacterLimit:2000,
+        getRequestCharacterLimit: 2000,
         // First-party cookie name prefix
-        configCookieNamePrefix : '_pk_',
-        siteId : '',
-        userId : '',
-        visitorId:''
+        configCookieNamePrefix: '_pk_',
+        siteId: '',
+        userId: '',
+        visitorId: ''
     };
     this.isClickTrackingEnabled = false;
 };
@@ -515,8 +517,8 @@ var UIS = function(){
  * @param input
  * @returns {boolean}
  */
-UIS.is_array = function(input){
-    return typeof(input)=='object'&&(input instanceof Array);
+UIS.is_array = function(input) {
+    return typeof(input) == 'object' && (input instanceof Array);
 };
 
 /**
@@ -524,27 +526,27 @@ UIS.is_array = function(input){
  * @param mixed_var
  * @returns {boolean}
  */
-UIS.is_object = function (mixed_var) {
+UIS.is_object = function(mixed_var) {
     if (mixed_var instanceof Array) {
         return false;
     } else {
-        return (mixed_var !== null) && (typeof( mixed_var ) == 'object');
+        return (mixed_var !== null) && (typeof(mixed_var) == 'object');
     }
 };
 
-UIS.isDefined = function (property) {
+UIS.isDefined = function(property) {
     var propertyType = typeof property;
     return propertyType !== 'undefined';
 };
 
-UIS.strtolower = function( str ) {
-    return (str+'').toLowerCase();
+UIS.strtolower = function(str) {
+    return (str + '').toLowerCase();
 };
 
-UIS.clone = function (mixed) {
+UIS.clone = function(mixed) {
     var newObj = (mixed instanceof Array) ? [] : {};
     for (var i in mixed) {
-        if (mixed[i] && (typeof mixed[i] == "object") ) {
+        if (mixed[i] && (typeof mixed[i] == "object")) {
             newObj[i] = UIS.clone(mixed[i]);
         } else {
             newObj[i] = mixed[i];
@@ -562,23 +564,23 @@ UIS.isIE = function() {
 UIS.getInternetExplorerVersion = function() {
 
     var rv = -1; // Return value assumes failure.
-    if (navigator.appName == 'Microsoft Internet Explorer')
-    {
+    if (navigator.appName == 'Microsoft Internet Explorer') {
         var ua = navigator.userAgent;
-        var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+        var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
         if (re.exec(ua) != null)
-            rv = parseFloat( RegExp.$1 );
+            rv = parseFloat(RegExp.$1);
     }
     return rv;
 };
 
 UIS.strpos = function(haystack, needle, offset) {
-    var i = (haystack+'').indexOf(needle, (offset || 0));
+    var i = (haystack + '').indexOf(needle, (offset || 0));
     return i === -1 ? false : i;
 };
 
-UIS.trim = function (str, charlist) {
-    var whitespace, l = 0, i = 0;
+UIS.trim = function(str, charlist) {
+    var whitespace, l = 0,
+        i = 0;
     str += '';
     if (!charlist) {
         // default list
@@ -608,11 +610,11 @@ UIS.trim = function (str, charlist) {
 
 
 
-UIS.setCookie =  function (name,value,days,path,domain,secure) {
+UIS.setCookie = function(name, value, days, path, domain, secure) {
     var date = new Date();
-    date.setTime(date.getTime()+(days*24*60*60*1000));
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
 
-    document.cookie = name + "=" + escape (value) +
+    document.cookie = name + "=" + escape(value) +
         ((days) ? "; expires=" + date.toGMTString() : "") +
         ((path) ? "; path=" + path : "") +
         ((domain) ? "; domain=" + domain : "") +
@@ -624,13 +626,13 @@ UIS.readAllCookies = function() {
     var ca = document.cookie.split(';');
 
     if (ca) {
-        for( var i=0;i < ca.length;i++ ) {
+        for (var i = 0; i < ca.length; i++) {
 
             var cat = UIS.trim(ca[i]);
             var pos = UIS.strpos(cat, '=');
-            var key = cat.substring(0,pos);
-            var value = cat.substring(pos+1, cat.length);
-            if ( ! jar.hasOwnProperty(key) ) {
+            var key = cat.substring(0, pos);
+            var value = cat.substring(pos + 1, cat.length);
+            if (!jar.hasOwnProperty(key)) {
                 jar[key] = [];
             }
             jar[key].push(value);
@@ -643,10 +645,10 @@ UIS.readAllCookies = function() {
 /**
  * 取cookie
  **/
-UIS.getCookie = function (name) {
+UIS.getCookie = function(name) {
     var jar = UIS.readAllCookies();
-    if ( jar ) {
-        if ( jar.hasOwnProperty(name) ) {
+    if (jar) {
+        if (jar.hasOwnProperty(name)) {
             return jar[name][0];
         } else {
             return '';
@@ -654,11 +656,11 @@ UIS.getCookie = function (name) {
     }
 };
 
-UIS.isDebug =  false;
+UIS.isDebug = false;
 
 UIS.debug = function() {
-    if ( this.isDebug ) {
-        if( window.console ) {
+    if (this.isDebug) {
+        if (window.console) {
             if (console.log.apply) {
                 if (window.console.firebug) {
                     console.log.apply(this, arguments);
@@ -670,28 +672,32 @@ UIS.debug = function() {
     }
 };
 
-UIS.urlEncode =  function(str){
-    str = (str+'').toString();
+UIS.urlEncode = function(str) {
+    str = (str + '').toString();
     return encodeURIComponent(str).replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/\*/g, '%2A').replace(/%20/g, '+');
 };
 
-UIS.urlDecode = function(str){
+UIS.urlDecode = function(str) {
     return decodeURIComponent(str.replace(/\+/g, '%20'));
 };
 
-UIS.sprintf = function(){
+UIS.sprintf = function() {
     var regex = /%%|%(\d+\$)?([-+\'#0 ]*)(\*\d+\$|\*|\d+)?(\.(\*\d+\$|\*|\d+))?([scboxXuidfegEG])/g;
-    var a = arguments, i = 0, format = a[i++];
+    var a = arguments,
+        i = 0,
+        format = a[i++];
 
     // pad()
-    var pad = function (str, len, chr, leftJustify) {
-        if (!chr) {chr = ' ';}
+    var pad = function(str, len, chr, leftJustify) {
+        if (!chr) {
+            chr = ' ';
+        }
         var padding = (str.length >= len) ? '' : Array(1 + len - str.length >>> 0).join(chr);
         return leftJustify ? str + padding : padding + str;
     };
 
     // justify()
-    var justify = function (value, prefix, leftJustify, minWidth, zeroPad, customPadChar) {
+    var justify = function(value, prefix, leftJustify, minWidth, zeroPad, customPadChar) {
         var diff = minWidth - value.length;
         if (diff > 0) {
             if (leftJustify || !zeroPad) {
@@ -704,16 +710,20 @@ UIS.sprintf = function(){
     };
 
     // formatBaseX()
-    var formatBaseX = function (value, base, prefix, leftJustify, minWidth, precision, zeroPad) {
+    var formatBaseX = function(value, base, prefix, leftJustify, minWidth, precision, zeroPad) {
         // Note: casts negative numbers to positive ones
         var number = value >>> 0;
-        prefix = prefix && number && {'2': '0b', '8': '0', '16': '0x'}[base] || '';
+        prefix = prefix && number && {
+            '2': '0b',
+            '8': '0',
+            '16': '0x'
+        }[base] || '';
         value = prefix + pad(number.toString(base), precision || 0, '0', false);
         return justify(value, prefix, leftJustify, minWidth, zeroPad);
     };
 
     // formatString()
-    var formatString = function (value, leftJustify, minWidth, precision, zeroPad, customPadChar) {
+    var formatString = function(value, leftJustify, minWidth, precision, zeroPad, customPadChar) {
         if (precision != null) {
             value = value.slice(0, precision);
         }
@@ -721,26 +731,44 @@ UIS.sprintf = function(){
     };
 
     // doFormat()
-    var doFormat = function (substring, valueIndex, flags, minWidth, _, precision, type) {
+    var doFormat = function(substring, valueIndex, flags, minWidth, _, precision, type) {
         var number;
         var prefix;
         var method;
         var textTransform;
         var value;
 
-        if (substring == '%%') {return '%';}
+        if (substring == '%%') {
+            return '%';
+        }
 
         // parse flags
-        var leftJustify = false, positivePrefix = '', zeroPad = false, prefixBaseX = false, customPadChar = ' ';
+        var leftJustify = false,
+            positivePrefix = '',
+            zeroPad = false,
+            prefixBaseX = false,
+            customPadChar = ' ';
         var flagsl = flags.length;
         for (var j = 0; flags && j < flagsl; j++) {
             switch (flags.charAt(j)) {
-                case ' ': positivePrefix = ' '; break;
-                case '+': positivePrefix = '+'; break;
-                case '-': leftJustify = true; break;
-                case "'": customPadChar = flags.charAt(j+1); break;
-                case '0': zeroPad = true; break;
-                case '#': prefixBaseX = true; break;
+                case ' ':
+                    positivePrefix = ' ';
+                    break;
+                case '+':
+                    positivePrefix = '+';
+                    break;
+                case '-':
+                    leftJustify = true;
+                    break;
+                case "'":
+                    customPadChar = flags.charAt(j + 1);
+                    break;
+                case '0':
+                    zeroPad = true;
+                    break;
+                case '#':
+                    prefixBaseX = true;
+                    break;
             }
         }
 
@@ -780,13 +808,20 @@ UIS.sprintf = function(){
         value = valueIndex ? a[valueIndex.slice(0, -1)] : a[i++];
 
         switch (type) {
-            case 's': return formatString(String(value), leftJustify, minWidth, precision, zeroPad, customPadChar);
-            case 'c': return formatString(String.fromCharCode(+value), leftJustify, minWidth, precision, zeroPad);
-            case 'b': return formatBaseX(value, 2, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
-            case 'o': return formatBaseX(value, 8, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
-            case 'x': return formatBaseX(value, 16, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
-            case 'X': return formatBaseX(value, 16, prefixBaseX, leftJustify, minWidth, precision, zeroPad).toUpperCase();
-            case 'u': return formatBaseX(value, 10, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
+            case 's':
+                return formatString(String(value), leftJustify, minWidth, precision, zeroPad, customPadChar);
+            case 'c':
+                return formatString(String.fromCharCode(+value), leftJustify, minWidth, precision, zeroPad);
+            case 'b':
+                return formatBaseX(value, 2, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
+            case 'o':
+                return formatBaseX(value, 8, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
+            case 'x':
+                return formatBaseX(value, 16, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
+            case 'X':
+                return formatBaseX(value, 16, prefixBaseX, leftJustify, minWidth, precision, zeroPad).toUpperCase();
+            case 'u':
+                return formatBaseX(value, 10, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
             case 'i':
             case 'd':
                 number = parseInt(+value, 10);
@@ -805,7 +840,8 @@ UIS.sprintf = function(){
                 textTransform = ['toString', 'toUpperCase']['eEfFgG'.indexOf(type) % 2];
                 value = prefix + Math.abs(number)[method](precision);
                 return justify(value, prefix, leftJustify, minWidth, zeroPad)[textTransform]();
-            default: return substring;
+            default:
+                return substring;
         }
     };
 
@@ -824,56 +860,56 @@ UIS.fn.getOption = function(name) {
     return this.config[name];
 };
 
-UIS.fn.getCookieName = function(name){
+UIS.fn.getCookieName = function(name) {
     return this.config['configCookieNamePrefix'] + name + '.' + this.config['siteId'];
 };
 
-UIS.fn.prepareRequestData = function( properties ) {
+UIS.fn.prepareRequestData = function(properties) {
 
-    var data = {};
+        var data = {};
 
-    for ( var param in properties ) {
-        var value = '';
-        if ( properties.hasOwnProperty( param ) ) {
-            if ( UIS.is_array( properties[param] ) ) {
-                var n = properties[param].length;
-                for ( var i = 0; i < n; i++ ) {
-                    if ( UIS.is_object( properties[param][i] ) ) {
-                        for ( var o_param in properties[param][i] ) {
-                            data[ UIS.sprintf( '%s[%s][%s]', param, i, o_param ) ] = UIS.urlEncode( properties[ param ][ i ][ o_param ] );
+        for (var param in properties) {
+            var value = '';
+            if (properties.hasOwnProperty(param)) {
+                if (UIS.is_array(properties[param])) {
+                    var n = properties[param].length;
+                    for (var i = 0; i < n; i++) {
+                        if (UIS.is_object(properties[param][i])) {
+                            for (var o_param in properties[param][i]) {
+                                data[UIS.sprintf('%s[%s][%s]', param, i, o_param)] = UIS.urlEncode(properties[param][i][o_param]);
+                            }
+                        } else {
+                            // what the heck is it then. assume string
+                            data[UIS.sprintf('%s[%s]', param, i)] = UIS.urlEncode(properties[param][i]);
                         }
-                    } else {
-                        // what the heck is it then. assume string
-                        data[ UIS.sprintf('%s[%s]', param, i) ] = UIS.urlEncode( properties[ param ][ i ] );
                     }
+                    // assume it's a string
+                } else {
+                    data[UIS.sprintf('%s', param)] = UIS.urlEncode(properties[param]);
                 }
-                // assume it's a string
-            } else {
-                data[ UIS.sprintf('%s', param) ] = UIS.urlEncode( properties[ param ] );
             }
         }
-    }
-    return data;
-},
+        return data;
+    },
 
-UIS.fn.prepareRequestDataForGet = function( properties ) {
-    var properties = this.prepareRequestData( properties );
-    var get = '';
-    for ( var param in properties ) {
-        if ( properties.hasOwnProperty( param ) ) {
-            var kvp = '';
-            kvp = UIS.sprintf('%s=%s&', param, properties[ param ] );
-            get += kvp;
+    UIS.fn.prepareRequestDataForGet = function(properties) {
+        var properties = this.prepareRequestData(properties);
+        var get = '';
+        for (var param in properties) {
+            if (properties.hasOwnProperty(param)) {
+                var kvp = '';
+                kvp = UIS.sprintf('%s=%s&', param, properties[param]);
+                get += kvp;
+            }
         }
-    }
-    return get;
-};
+        return get;
+    };
 
 UIS.fn._parseRequestUrl = function(properties) {
 
-    var params = this.prepareRequestDataForGet( properties );
+    var params = this.prepareRequestDataForGet(properties);
 
-    var log_url = this.getOption('trackerUrl');//this.getLoggerEndpoint();
+    var log_url = this.getOption('trackerUrl'); //this.getLoggerEndpoint();
 
     if (log_url.indexOf('?') === -1) {
         log_url += '?';
@@ -884,21 +920,21 @@ UIS.fn._parseRequestUrl = function(properties) {
     return full_url;
 };
 
-UIS.fn.getIframeDocument = function ( iframe ) {
+UIS.fn.getIframeDocument = function(iframe) {
     var doc = null;
-    if( iframe.contentDocument ) {
+    if (iframe.contentDocument) {
         // Firefox, Opera
         doc = iframe.contentDocument;
-    } else if( iframe.contentWindow && iframe.contentWindow.document ) {
+    } else if (iframe.contentWindow && iframe.contentWindow.document) {
         // Internet Explorer
         doc = iframe.contentWindow.document;
-    } else if(iframe.document) {
+    } else if (iframe.document) {
         // Others?
         doc = iframe.document;
     }
 
     // If we did not succeed in finding the document then throw an exception
-    if( doc == null ) {
+    if (doc == null) {
         UIS.debug("Document not found, append the parent element to the DOM before creating the IFrame");
     }
 
@@ -908,7 +944,7 @@ UIS.fn.getIframeDocument = function ( iframe ) {
     return doc;
 };
 
-UIS.fn.postFromIframe = function( ifr, data ) {
+UIS.fn.postFromIframe = function(ifr, data) {
 
     var post_url = this.getOption('trackerUrl'); //this.getLoggerEndpoint();
     var doc = this.getIframeDocument(ifr);
@@ -917,50 +953,50 @@ UIS.fn.postFromIframe = function( ifr, data ) {
     var form_name = 'post_form' + Math.random();
 
     // cannot set the name of an element using setAttribute
-    if ( UIS.isIE()  && UIS.getInternetExplorerVersion() < 9.0 ) {
+    if (UIS.isIE() && UIS.getInternetExplorerVersion() < 9.0) {
         var frm = doc.createElement('<form name="' + form_name + '"></form>');
     } else {
         var frm = doc.createElement('form');
-        frm.setAttribute( 'name', form_name );
+        frm.setAttribute('name', form_name);
     }
 
-    frm.setAttribute( 'id', form_name );
+    frm.setAttribute('id', form_name);
     frm.setAttribute("action", post_url);
     frm.setAttribute("method", "POST");
 
     // create hidden inputs, add them to form
-    for ( var param in data ) {
+    for (var param in data) {
         if (data.hasOwnProperty(param)) {
             // cannot set the name of an element using setAttribute
-            if ( UIS.isIE() && UIS.getInternetExplorerVersion() < 9.0 ) {
-                var input = doc.createElement( "<input type='hidden' name='" + param + "' />" );
+            if (UIS.isIE() && UIS.getInternetExplorerVersion() < 9.0) {
+                var input = doc.createElement("<input type='hidden' name='" + param + "' />");
             } else {
-                var input = document.createElement( "input" );
-                input.setAttribute( "name",param );
-                input.setAttribute( "type","hidden");
+                var input = document.createElement("input");
+                input.setAttribute("name", param);
+                input.setAttribute("type", "hidden");
             }
-            input.setAttribute( "value", data[param] );
-            frm.appendChild( input );
+            input.setAttribute("value", data[param]);
+            frm.appendChild(input);
         }
     }
     // add form to iframe
-    doc.body.appendChild( frm );
+    doc.body.appendChild(frm);
 
     //submit the form inside the iframe
     doc.forms[form_name].submit();
 
     // remove the form from iframe to clean things up
-    doc.body.removeChild( frm );
+    doc.body.removeChild(frm);
 };
 
 /**
  * Generates a hidden 1x1 pixel iframe
  */
-UIS.fn.generateHiddenIframe = function ( parentElement, data ) {
+UIS.fn.generateHiddenIframe = function(parentElement, data) {
 
     var iframe_name = 'uis-tracker-post-iframe';
 
-    if ( UIS.isIE() && UIS.getInternetExplorerVersion() < 9.0 ) {
+    if (UIS.isIE() && UIS.getInternetExplorerVersion() < 9.0) {
         var iframe = document.createElement('<iframe name="' + iframe_name + '" scr="about:blank" width="1" height="1"></iframe>');
     } else {
         var iframe = document.createElement("iframe");
@@ -977,54 +1013,54 @@ UIS.fn.generateHiddenIframe = function ( parentElement, data ) {
     var that = this;
 
     // If no parent element is specified then use body as the parent element
-    if ( parentElement == null ) {
+    if (parentElement == null) {
         parentElement = document.body;
     }
     // This is necessary in order to initialize the document inside the iframe
-    parentElement.appendChild( iframe );
+    parentElement.appendChild(iframe);
 
     // set a timer to check and see if the iframe is fully loaded.
     // without this there is a race condition in IE8
-    var timer = setInterval( function() {
+    var timer = setInterval(function() {
 
-        var doc = that.getIframeDocument( iframe );
+        var doc = that.getIframeDocument(iframe);
 
-        if ( doc ) {
+        if (doc) {
             that.postFromIframe(iframe, data);
             clearInterval(timer);
         }
 
-    }, 1 );
+    }, 1);
 
     // needed to cleanup history items in browsers like Firefox
 
-    var cleanuptimer = setInterval( function() {
+    var cleanuptimer = setInterval(function() {
         parentElement.removeChild(iframe);
         clearInterval(cleanuptimer);
-    }, 1000 );
+    }, 1000);
 
 };
 
 
-UIS.fn.cdPost = function ( data ) {
+UIS.fn.cdPost = function(data) {
 
     var container_id = "uis-tracker-post-container";
     var post_url = this.getOption('trackerUrl'); //this.getLoggerEndpoint();
 
-    var iframe_container = document.getElementById( container_id );
+    var iframe_container = document.getElementById(container_id);
 
     // create iframe container if necessary
-    if ( ! iframe_container ) {
+    if (!iframe_container) {
 
         // create post frame container
-        var div = document.createElement( 'div' );
-        div.setAttribute( 'id', container_id );
-        document.body.appendChild( div );
-        iframe_container = document.getElementById( container_id );
+        var div = document.createElement('div');
+        div.setAttribute('id', container_id);
+        document.body.appendChild(div);
+        iframe_container = document.getElementById(container_id);
     }
 
     // create iframe and post data once its fully loaded.
-    this.generateHiddenIframe( iframe_container, data );
+    this.generateHiddenIframe(iframe_container, data);
 };
 
 UIS.fn._getTarget = function(e) {
@@ -1032,7 +1068,7 @@ UIS.fn._getTarget = function(e) {
     // Determine the actual html element that generated the event
     var targ = e.target || e.srcElement;
 
-    if( typeof targ == 'undefined' || targ==null ) {
+    if (typeof targ == 'undefined' || targ == null) {
         return null; //not all ie events provide srcElement
     }
     if (targ.nodeType == 3) {
@@ -1043,28 +1079,24 @@ UIS.fn._getTarget = function(e) {
 
 UIS.fn.findPosX = function(obj) {
     var curleft = 0;
-    if (obj.offsetParent)
-    {
-        while (obj.offsetParent)
-        {
+    if (obj.offsetParent) {
+        while (obj.offsetParent) {
             curleft += obj.offsetLeft;
             obj = obj.offsetParent;
         }
-    }
-    else if (obj.x)
+    } else if (obj.x)
         curleft += obj.x;
     return curleft;
 };
 
 UIS.fn.findPosY = function(obj) {
     var curtop = 0;
-    if (obj.offsetParent){
-        while (obj.offsetParent){
+    if (obj.offsetParent) {
+        while (obj.offsetParent) {
             curtop += obj.offsetTop
             obj = obj.offsetParent;
         }
-    }
-    else if (obj.y)
+    } else if (obj.y)
         curtop += obj.y;
     return curtop;
 };
@@ -1111,15 +1143,15 @@ UIS.fn.urlFixup = function(hostName, href, referrer) {
     if (!href) {
         href = '';
     }
-    if (hostName === 'translate.googleusercontent.com') {       // Google
+    if (hostName === 'translate.googleusercontent.com') { // Google
         if (referrer === '') {
             referrer = href;
         }
         href = this.getParameter(href, 'u');
         hostName = this.getHostName(href);
-    } else if (hostName === 'cc.bingj.com' ||                   // Bing
-        hostName === 'webcache.googleusercontent.com' ||    // Google
-        hostName.slice(0, 5) === '74.6.') {                 // Yahoo (via Inktomi 74.6.0.0/16)
+    } else if (hostName === 'cc.bingj.com' || // Bing
+        hostName === 'webcache.googleusercontent.com' || // Google
+        hostName.slice(0, 5) === '74.6.') { // Yahoo (via Inktomi 74.6.0.0/16)
         href = document.links[0].href;
         hostName = this.getHostName(href);
     }
@@ -1140,31 +1172,31 @@ UIS.fn.urlFixup = function(hostName, href, referrer) {
  * @param block
  * @param callback
  */
-UIS.fn.logEvent = function(properties, block, callback){
+UIS.fn.logEvent = function(properties, block, callback) {
 
-        // append site_id to properties
-        // properties.site_id = this.getSiteId();
+    // append site_id to properties
+    // properties.site_id = this.getSiteId();
 
-        var url = this._parseRequestUrl(properties);
-        var limit = this.getOption('getRequestCharacterLimit');
-        if ( url.length > limit ) {
-            //this.cdPost( this.prepareRequestData( properties ) );
-            var data = this.prepareRequestData( properties );
-            this.cdPost( data );
-        } else {
-            UIS.debug('url : %s', url);
-            var image = new Image(1, 1);
-            //expireDateTime = now.getTime() + delay;
-            image.onLoad = function () { };
-            image.src = url;
-            if (block) {
-                //OWA.debug(' blocking...');
-            }
-            UIS.debug('Inserted web bug for %s', properties['event_type']);
+    var url = this._parseRequestUrl(properties);
+    var limit = this.getOption('getRequestCharacterLimit');
+    if (url.length > limit) {
+        //this.cdPost( this.prepareRequestData( properties ) );
+        var data = this.prepareRequestData(properties);
+        this.cdPost(data);
+    } else {
+        UIS.debug('url : %s', url);
+        var image = new Image(1, 1);
+        //expireDateTime = now.getTime() + delay;
+        image.onLoad = function() {};
+        image.src = url;
+        if (block) {
+            //OWA.debug(' blocking...');
         }
-        if (callback && (typeof(callback) === "function")) {
-            callback();
-        }
+        UIS.debug('Inserted web bug for %s', properties['event_type']);
+    }
+    if (callback && (typeof(callback) === "function")) {
+        callback();
+    }
 };
 
 
@@ -1182,7 +1214,7 @@ UIS.fn.clickEventHandler = function(e) {
     var click_id = click.generateRandomUuid();
     click.setAction(click_id);
 
-    if ( targ.hasOwnProperty && targ.hasOwnProperty( 'value' ) && targ.value.length > 0 ) {
+    if (targ.hasOwnProperty && targ.hasOwnProperty('value') && targ.value.length > 0) {
         dom_value = targ.value;
     }
     // click.setName(dom_value);
@@ -1196,26 +1228,26 @@ UIS.fn.clickEventHandler = function(e) {
     // var targ = this._getTarget(e);
     //
     // var dom_name = '(not set)';
-    if ( targ.hasOwnProperty && targ.hasOwnProperty( 'name' ) && targ.name.length > 0 ) {
+    if (targ.hasOwnProperty && targ.hasOwnProperty('name') && targ.name.length > 0) {
         click.set('click_name', targ.name);
     }
     // click.set("dom_element_name", dom_name);
     //
     // var dom_value = '(not set)';
-    if ( targ.hasOwnProperty && targ.hasOwnProperty( 'value' ) && targ.value.length > 0 ) {
+    if (targ.hasOwnProperty && targ.hasOwnProperty('value') && targ.value.length > 0) {
         // dom_value = targ.value;
         click.set('click_value', targ.value);
     }
     // click.set("dom_element_value", dom_value);
     //
     // var dom_id = '(not set)';
-    if ( targ.hasOwnProperty && targ.hasOwnProperty( 'id' ) && targ.id.length > 0) {
+    if (targ.hasOwnProperty && targ.hasOwnProperty('id') && targ.id.length > 0) {
         click.set('click_id', targ.id);
     }
     // click.set("dom_element_id", dom_id);
     //
     // var dom_class = '(not set)';
-    if ( targ.className && targ.className.length > 0) {
+    if (targ.className && targ.className.length > 0) {
         click.set('click_class', targ.className);
     }
     // click.set("dom_element_class", dom_class);
@@ -1243,7 +1275,7 @@ UIS.fn.clickEventHandler = function(e) {
     // var full_click = UIS.clone(click);
     //if all that works then log
     // if (this.getOption('logClicksAsTheyHappen')) {
-        this.logEvent(click.getProperties());
+    this.logEvent(click.getProperties());
     // }
 
 
@@ -1251,13 +1283,17 @@ UIS.fn.clickEventHandler = function(e) {
 };
 
 UIS.fn.bindClickEvents = function() {
-    if ( ! this.isClickTrackingEnabled ) {
+    if (!this.isClickTrackingEnabled) {
         var that = this;
         // Registers the handler for the before navigate event so that the dom stream can be logged
         if (window.addEventListener) {
-            window.addEventListener('click', function (e) {that.clickEventHandler(e);}, false);
-        } else if(window.attachEvent) {
-            document.attachEvent('onclick', function (e) {that.clickEventHandler(e);});
+            window.addEventListener('click', function(e) {
+                that.clickEventHandler(e);
+            }, false);
+        } else if (window.attachEvent) {
+            document.attachEvent('onclick', function(e) {
+                that.clickEventHandler(e);
+            });
         }
         this.isClickTrackingEnabled = true;
     }
@@ -1276,11 +1312,11 @@ UIS.fn.trackClicks = function(handler) {
  * 监控jqueryAjax请求
  * @param jq
  */
-UIS.fn.trackJqueryAjax = function(jq){
+UIS.fn.trackJqueryAjax = function(jq) {
     var self = this;
     var ajaxBack = jq.ajax;
-    jq.ajax = function(url1, setting){
-        if ( typeof url1 === "object" ) {
+    jq.ajax = function(url1, setting) {
+        if (typeof url1 === "object") {
             setting = url1;
             url1 = undefined;
         }
@@ -1288,23 +1324,33 @@ UIS.fn.trackJqueryAjax = function(jq){
         // Force options to be an object
         setting = setting || {};
 
-        var cb = setting.complete;
-        var begin = new Date().getTime(),
-            url = setting['url'],
-	          oneTime;
-        setting.beforeSend =  function(xhr){
+        var cb = setting.complete,
+            bs = setting.beforeSend,
+            df = setting.dataFilter,
+            begin = new Date().getTime(),
+            oneTime,
+            url = setting['url'];
+        setting.beforeSend = function(xhr) {
             xhr.setRequestHeader("Action-Id", window.action_id);
+            if (jq.isFunction(bs)) {
+                bs.apply(this, arguments)
+            }
         }
-      	setting.dataFilter = function(data, type){
-      		oneTime = new Date().getTime();
-      		return data;
-      	}
-        setting.complete = function(data, textStatus, request){
+        setting.dataFilter = function(data, type) {
+            oneTime = new Date().getTime();
+            if (jq.isFunction(df)) {
+                return df.apply(this, arguments)
+            }
+            return data;
+        }
+        setting.complete = function(data, textStatus, request) {
             //var oneTime = new Date().getTime();
             var ajax_id = data.getResponseHeader("txID");
             var actionId = data.getResponseHeader("Action-Id");
             var clength = data.getResponseHeader("Content-Length");
-            if(jq.isFunction(cb)){cb.apply(this, arguments)}
+            if (jq.isFunction(cb)) {
+                cb.apply(this, arguments)
+            }
             var twoTime = new Date().getTime();
             var ajax_timing = oneTime - begin;
             var ajax_timing_cb = twoTime - begin;
@@ -1313,36 +1359,36 @@ UIS.fn.trackJqueryAjax = function(jq){
             event.setEventType("ajax");
             event.setAction(actionId);
             event.set('ajax_id', ajax_id);
-            event.set('content_length' , clength || 0);
-            event.set('ajax_tm' , ajax_timing);
-            event.set('ajax_tm_cb',ajax_timing_cb);
+            event.set('content_length', clength || 0);
+            event.set('ajax_tm', ajax_timing);
+            event.set('ajax_tm_cb', ajax_timing_cb);
 
-            event.set('url_ajax',url);
+            event.set('url_ajax', url);
             self.logEvent(event.getProperties())
         };
         return ajaxBack(url1, setting);
     }
 };
 
-UIS.fn._trackRouterEvent = function(event){
-    var  locationArray = this.urlFixup(document.domain, window.location.href, this.getReferrer());
+UIS.fn._trackRouterEvent = function(event) {
+    var locationArray = this.urlFixup(document.domain, window.location.href, this.getReferrer());
     //var locationHrefAlias = decodeURIComponent(locationArray[1]);
     var configReferrerUrl = decodeURIComponent(locationArray[2]);
-    event.set('url',window.location.href);
+    event.set('url', window.location.href);
     if (configReferrerUrl)
         event.set("url_ref", configReferrerUrl);
 };
 
-UIS.fn.trackRouter = function(){
+UIS.fn.trackRouter = function() {
     var that = this;
-    var hashChangeFunc = function(e){
+    var hashChangeFunc = function(e) {
         var event = new UISEvent(that);
         event.setEventType("page_route");
         // event.setAction("");
         that._trackRouterEvent(event);
         that.logEvent(event.getProperties());
     };
-    var popstateFunc = function(e){
+    var popstateFunc = function(e) {
         var event = new UISEvent(that);
         event.setEventType("page_route");
         // event.setAction("");
@@ -1350,23 +1396,23 @@ UIS.fn.trackRouter = function(){
         that.logEvent(event.getProperties());
     };
 
-    if (typeof window.onhashchange != 'undefined'){
+    if (typeof window.onhashchange != 'undefined') {
         if (window.addEventListener) {
             window.addEventListener('hashchange', hashChangeFunc, false);
-        } else if(window.attachEvent) {
+        } else if (window.attachEvent) {
             window.attachEvent('onhashchange', hashChangeFunc);
         }
-  };
-    if (typeof window.onpopstate != 'undefined'){
+    };
+    if (typeof window.onpopstate != 'undefined') {
         if (window.addEventListener) {
             window.addEventListener('popstate', popstateFunc, false);
-        } else if(window.attachEvent) {
+        } else if (window.attachEvent) {
             window.attachEvent('onpopstate', popstateFunc);
         }
     };
-    if (window.history.pushState){
+    if (window.history.pushState) {
         window.history._pushState = window.history.pushState;
-        window.history.pushState = function(state, title, url){
+        window.history.pushState = function(state, title, url) {
             window.history._pushState(state, title, url);
             var event = new UISEvent(that);
             event.setEventType("page_route");
@@ -1375,9 +1421,9 @@ UIS.fn.trackRouter = function(){
             that.logEvent(event.getProperties());
         }
     }
-    if (window.history.replaceState){
+    if (window.history.replaceState) {
         window.history._replaceState = window.history.replaceState;
-        window.history.replaceState = function(state, title, url){
+        window.history.replaceState = function(state, title, url) {
             window.history._replaceState(state, title, url);
             var event = new UISEvent(that);
             event.setEventType("page_route");
@@ -1388,11 +1434,11 @@ UIS.fn.trackRouter = function(){
     }
 };
 
-UIS.fn.trackPageLoad = function(){
+UIS.fn.trackPageLoad = function() {
     var that = this;
     var event = new UISEvent(this);
     var myTime = window.timing.getTimes();
-    if(myTime.loadTime > 0){
+    if (myTime.loadTime > 0) {
         //var load_tm = myTime.loadTime;
         var action_id = event.generateRandomUuid();
         event.setEventType("page_load");
@@ -1410,60 +1456,63 @@ UIS.fn.trackPageLoad = function(){
         event.set('t_onload', myTime.t_onload || 0);
         event.set('t_white', myTime.t_white || 0);
         event.set('t_all', myTime.t_all || 0);
-        event.set('ajax_tm' , myTime.t_all || 0);
+        event.set('ajax_tm', myTime.t_all || 0);
         this.logEvent(event.getProperties());
-    }else{
-        setTimeout(function(){that.trackPageLoad()},400);
+    } else {
+        setTimeout(function() {
+            that.trackPageLoad()
+        }, 400);
     }
 };
 
-UIS.fn.log = function(params){
+UIS.fn.log = function(params) {
     if (typeof params != 'object') return;
     var event = new UISEvent(this);
     event.setEventType('custom');
-    for (var key in params){
-        if (key.indexOf('ext') == 0){
+    for (var key in params) {
+        if (key.indexOf('ext') == 0) {
             event.set(key, params[key])
         }
     }
     this.logEvent(event.getProperties());
 };
 
-UIS.fn.trackError = function(){
-    window.onerror = function(msg,url,line,col,error){
-        if (msg != "Script error." && !url){
+UIS.fn.trackError = function() {
+    window.onerror = function(msg, url, line, col, error) {
+        if (msg != "Script error." && !url) {
             return true;
         }
-        setTimeout(function(){
-            var data = {};
-            col = col || (window.event && window.event.errorCharacter) || 0;
-            data.url = url;
-            data.line = line;
-            data.col = col;
-            if (!!error && !!error.stack){
-                data.msg = error.stack.toString();
-            }else if (!!arguments.callee){
-                var ext = [];
-                var f = arguments.callee.caller, c = 3;
-                while (f && (--c>0)) {
-                    ext.push(f.toString());
-                    if (f  === f.caller) {
-                        break;
+        setTimeout(function() {
+                var data = {};
+                col = col || (window.event && window.event.errorCharacter) || 0;
+                data.url = url;
+                data.line = line;
+                data.col = col;
+                if (!!error && !!error.stack) {
+                    data.msg = error.stack.toString();
+                } else if (!!arguments.callee) {
+                    var ext = [];
+                    var f = arguments.callee.caller,
+                        c = 3;
+                    while (f && (--c > 0)) {
+                        ext.push(f.toString());
+                        if (f === f.caller) {
+                            break;
+                        }
+                        f = f.caller;
                     }
-                    f = f.caller;
+                    ext = ext.join(",");
+                    data.msg = ext;
                 }
-                ext = ext.join(",");
-                data.msg = ext;
-            }
-            var uis = window.uis || new UIS();
-            var event = new UISEvent(uis);
-            event.setEventType("jserror");
-            event.set("error_js", data.url);
-            event.set("error_line", data.line);
-            event.set("error_col", data.col);
-            event.set("error_msg", data.msg);
-            uis.logEvent(event.getProperties());
-        },0)
-        //return true;
+                var uis = window.uis || new UIS();
+                var event = new UISEvent(uis);
+                event.setEventType("jserror");
+                event.set("error_js", data.url);
+                event.set("error_line", data.line);
+                event.set("error_col", data.col);
+                event.set("error_msg", data.msg);
+                uis.logEvent(event.getProperties());
+            }, 0)
+            //return true;
     };
 }
