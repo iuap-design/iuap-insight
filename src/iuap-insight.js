@@ -1302,6 +1302,7 @@ UIS.fn.trackJqueryAjax = function(jq){
             if(jq.isFunction(cb)){cb.apply(this, arguments)}
             var twoTime = new Date().getTime();
             var ajax_timing = oneTime - begin;
+            var ajax_timing_cb = twoTime - begin;
             var event = new UISEvent(self);
 
             event.setEventType("ajax");
@@ -1309,6 +1310,7 @@ UIS.fn.trackJqueryAjax = function(jq){
             event.set('ajax_id', ajax_id);
             event.set('content_length' , clength || 0);
             event.set('ajax_tm' , ajax_timing);
+            event.set('ajax_tm_cb' , ajax_timing_cb);
 
             event.set('url_ajax',url);
             self.logEvent(event.getProperties())

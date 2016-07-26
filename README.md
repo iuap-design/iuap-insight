@@ -43,3 +43,11 @@ uis.trackJqueryAjax($);
 1. 正常的监听方法都可在引入iuap-insight.js后直接调用。对于方法 `.tranckJqueryAjax($)`,要注意，一定先能获取到jquery对象。对于常规html页面，可在引入jquery的script标签之后该用该方法。对于使用AMD或commonJS规范的页面，需要在require jquery模块之后，调用该方法。
 
 
+## 压缩js
+
+执行命令：
+```
+  gulp script
+```
+
+在dist 目录下产生 *.min.js
