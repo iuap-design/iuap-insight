@@ -1360,8 +1360,8 @@ UIS.fn.trackJqueryAjax = function(jq) {
             event.setAction(actionId);
             event.set('ajax_id', ajax_id);
             event.set('content_length', clength || 0);
-            event.set('ajax_tm', ajax_timing);
-            event.set('ajax_tm_cb', ajax_timing_cb);
+            event.set('ajax_tm', ajax_timing || 0);
+            event.set('ajax_tm_cb', ajax_timing_cb || 0);
 
             event.set('url_ajax', url);
             self.logEvent(event.getProperties())
