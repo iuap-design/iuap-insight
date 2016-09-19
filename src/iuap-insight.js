@@ -1374,6 +1374,7 @@ UIS.fn._trackRouterEvent = function(event) {
     var locationArray = this.urlFixup(document.domain, window.location.href, this.getReferrer());
     //var locationHrefAlias = decodeURIComponent(locationArray[1]);
     var configReferrerUrl = decodeURIComponent(locationArray[2]);
+    event.setAction(window.action_id);
     event.set('url', window.location.href);
     if (configReferrerUrl)
         event.set("url_ref", configReferrerUrl);
