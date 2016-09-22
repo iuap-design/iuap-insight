@@ -509,6 +509,7 @@ var UIS = function() {
         visitorId: ''
     };
     this.isClickTrackingEnabled = false;
+    this.isTrackingJqueryAjax = false;
 };
 
 //全局方法
@@ -1175,8 +1176,12 @@ UIS.fn.urlFixup = function(hostName, href, referrer) {
  */
 UIS.fn.logEvent = function(properties, block, callback) {
 
-    // append site_id to properties
-    // properties.site_id = this.getSiteId();
+    //每次发送请求之前，检查是否有jqueryAjax的track
+    if (this.isTrackingJqueryAjax === false){
+      if (window.$ && window.$.ajax){
+        this.trackJqueryAjax(window.$);
+      }
+    }
 
     var url = this._parseRequestUrl(properties);
     var limit = this.getOption('getRequestCharacterLimit');
@@ -1369,6 +1374,7 @@ UIS.fn.trackJqueryAjax = function(jq) {
         };
         return ajaxBack(url1, setting);
     }
+    this.isTrackingJqueryAjax = true;
 };
 
 UIS.fn._trackRouterEvent = function(event) {
@@ -1518,3 +1524,25 @@ UIS.fn.trackError = function() {
             //return true;
     };
 }
+
+UIS.fn.start = function(params) {
+    if (params['trackerUrl']){
+      this.setOption("trackerUrl", params['trackerUrl']);
+    }
+    if (params['userId']){
+      this.setOption("userId", params['userId']);
+    }
+    if (params['siteId']){
+      this.setOption("siteId", params['siteId']);
+    }
+    this.trackClicks();
+    this.trackRouter();
+    this.trackPageLoad();
+    this.trackError();
+    if (window.$ && window.$.ajax){
+      this.trackJqueryAjax(window.$);
+    }
+}
+
+
+window.uis = new UIS();

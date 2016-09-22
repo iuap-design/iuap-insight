@@ -12,28 +12,20 @@
 
 在页面中做如下配置：
 ```
-window.uis = new UIS();
-uis.setOption("trackerUrl", 'http://172.20.13.81:8080/browserInsight/collect');
-uis.setOption("userId","testUserId");
-uis.setOption("siteId","mysite1");
-uis.trackClicks();
-uis.trackRouter();
-uis.trackPageLoad();
-uis.trackError();
-uis.trackJqueryAjax($);
+uis.start({
+  trackerUrl: 'http://172.20.13.81:8080/browserInsight/collect',
+  userId:user,
+  siteId:'mysite1',
+});
 ```
 
 配置说明：
 
-`trackerUrl` : 后台监听rul  
+`trackerUrl` : 后台监听url  
 `userId`: 用户id  
 `siteId`: 站点id
 
 方法：  
-`.trackClicks()` : 监听鼠标点击   
-`.trackRouter()` : 监听路由变化  
-`.trackPageLoad()` : 监听页面加载  
-`.trackError()` : 监听页面错误
 `.trackJqueryAjax($)` : 监听jquery的ajax事件，参数为jquery对象。需要先引入jquery，才能调用此方法。
 `.log({ext1:'xxx',ext2:'xxx'})` : 用户自定义日志信息，开发者在需要记日志的地方调用此方法，参数只能是: ext1,ext2 ... ext5。
 
