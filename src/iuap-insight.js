@@ -1241,8 +1241,12 @@ UIS.fn.clickEventHandler = function(e) {
     //
     // var dom_value = '(not set)';
     if (targ.hasOwnProperty && targ.hasOwnProperty('value') && targ.value.length > 0) {
-        // dom_value = targ.value;
-        click.set('click_value', targ.value);
+        var dom_value = targ.value + '';
+        dom_value = dom_value.replace( /^\s*/, "");
+        if (dom_value.length > 0){
+          dom_value = dom_value.substring(0,20);
+          click.set('click_value', dom_value);
+        }
     }
     // click.set("dom_element_value", dom_value);
     //
