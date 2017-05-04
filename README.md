@@ -10,6 +10,18 @@
 
 ### 2. 配置监听
 
+/**
+ * description: 实现端到端性能数据上报
+ * example:
+ *  uis.setOption('trackerUrl', '')
+ *  uis.setOption('userId', '')
+ *  uis.trackClicks(); 监听点击事件
+ *  uis.trackRouter(); 监听路由变化
+ *  uis.trackPageLoad(); 监听页面加载
+ *  uis.trackError(); 监听页面错误
+ * version: 2016.9.19
+ */
+ 
 在页面中做如下配置：
 ```
 uis.start({
