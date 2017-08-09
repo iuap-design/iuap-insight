@@ -1,6 +1,7 @@
 /**
- * Created by dingrf on 2016/7/14.
- * version: 2016.12.09
+ * https://github.com/iuap-design/iuap-insight/edit/master/src/iuap-insight.js
+ * Version: 1.1.0
+ * Last Update: 2017.08.09
  */
 
 
@@ -1137,6 +1138,16 @@ UIS.fn.getHostName = function(url) {
     return matches ? matches[1] : url;
 }
 
+/**
+ * 上报某个数据项目
+ * @param  {[type]} name [description]
+ * @param  {[type]} val  [description]
+ * @return {[type]}      [description]
+ */
+UIS.fn.track = function(name, val){
+  uis.setOption(name, val);
+  uis.bindClickEvents();
+}
 
 UIS.fn.urlFixup = function(hostName, href, referrer) {
     if (!hostName) {
@@ -1223,10 +1234,12 @@ UIS.fn.clickEventHandler = function(e) {
     if (targ.hasOwnProperty && targ.hasOwnProperty('value') && targ.value.length > 0) {
         dom_value = targ.value;
     }
-    // click.setName(dom_value);
-    // click.set('click_pos', this.findPosX(targ) + ',' + this.findPosY(targ));
-    click.set('click_text', targ.innerText);
+    // 点击获取
+    // click.set('click_text', targ.innerText);
+    var click_text_value = uis.getOption('click_text')
+    click.set('click_text', click_text_value);
 
+    // 点击 ->
 
     // click.set('click_value', targ.innerText);
     //click.setValue(this.findPosX(targ) + ',' + this.findPosY(targ));
@@ -1241,12 +1254,8 @@ UIS.fn.clickEventHandler = function(e) {
     //
     // var dom_value = '(not set)';
     if (targ.hasOwnProperty && targ.hasOwnProperty('value') && targ.value.length > 0) {
-        var dom_value = targ.value + '';
-        dom_value = dom_value.replace( /^\s*/, "");
-        if (dom_value.length > 0){
-          dom_value = dom_value.substring(0,20);
-          click.set('click_value', dom_value);
-        }
+        // dom_value = targ.value;
+        click.set('click_value', targ.value);
     }
     // click.set("dom_element_value", dom_value);
     //
@@ -1313,7 +1322,7 @@ UIS.fn.bindClickEvents = function() {
  *监控click事件
  * @param handler
  */
-UIS.fn.trackClicks = function(handler) {
+UIS.fn.trackClicks = function( ) {
     // this.setOption('logClicksAsTheyHappen', true);
     this.bindClickEvents();
 };
@@ -1468,7 +1477,7 @@ UIS.fn.trackPageLoad = function() {
         event.set('t_onload', myTime.t_onload || 0);
         event.set('t_white', myTime.t_white || 0);
         event.set('t_all', myTime.t_all || 0);
-        //event.set('ajax_tm', myTime.t_all || 0);
+        event.set('ajax_tm', myTime.t_all || 0);
         this.logEvent(event.getProperties());
     } else {
         setTimeout(function() {
@@ -1539,7 +1548,7 @@ UIS.fn.start = function(params) {
     if (params['siteId']){
       this.setOption("siteId", params['siteId']);
     }
-    this.trackClicks();
+    // this.trackClicks();
     this.trackRouter();
     this.trackPageLoad();
     this.trackError();
