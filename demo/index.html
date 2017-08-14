@@ -5,7 +5,19 @@
   <title> iUAP-insight tester</title>
 </head>
 <body>
-  <div id="app"></div>
-  <script src="../lib/index.js"></script>
+  <div id="app" style="background-color: red;width: 100%;"> 点击</div>
+  <script src="../src/iuap-insight.js"></script>
+  <script src="http://design.yonyoucloud.com/static/jquery/3.2.1/jquery.js"></script>
+  <script>
+    uis.start({
+      trackerUrl: 'https://developer.yonyoucloud.com/iuapInsight/collect',
+      userId:'1511676',
+      siteId:'csj',
+    });
+
+    $('#app').click(function(e){
+      uis.track(e, 'click_text', '设置的信息')
+    })
+  </script>
 </body>
 </html>

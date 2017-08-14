@@ -28,7 +28,6 @@
 
 ```
 <div id="app" style="background:#ccc;"> 点我发送 </div>
-<div id="root" style="background:#ddd;"> fff </div>
 
 <script src="http://design.yonyoucloud.com/static/jquery/3.2.1/jquery.js"></script>
 <script type="text/javascript" src="./iuap-insight.js"></script>
@@ -41,10 +40,7 @@
   });
 
   $('#app').click(function(e){
-    uis.track('click_text', '33333')
-  })
-  $('#root').click(function(e){
-    uis.track('click_text', '9999')
+    uis.track(e, 'click_text', '设置的信息')
   })
 </script>
 ```
@@ -62,4 +58,4 @@
 
 ## 温馨提示
 
-- 使用 `.tranckJqueryAjax($)` 这个 API 之前需要提前引入 jquery 。
+- 使用 `.tranckJqueryAjax($)` 这个 API 之前需要提前引入 jquery ，并且使用了 $.ajax 。

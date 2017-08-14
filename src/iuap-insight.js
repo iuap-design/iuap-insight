@@ -511,6 +511,7 @@ var UIS = function() {
     };
     this.isClickTrackingEnabled = false;
     this.isTrackingJqueryAjax = false;
+    this.isTrackedClick = false; // 是否已经监听过点击事件
 };
 
 //全局方法
@@ -1139,14 +1140,17 @@ UIS.fn.getHostName = function(url) {
 }
 
 /**
- * 上报某个数据项目
- * @param  {[type]} name [description]
- * @param  {[type]} val  [description]
+ * [track description]
+ * @param  {[type]} e    [description] 事件对象
+ * @param  {[type]} name [description] 字段名称
+ * @param  {[type]} val  [description] 字段值
  * @return {[type]}      [description]
  */
-UIS.fn.track = function(name, val){
+UIS.fn.track = function(e, name, val){
   uis.setOption(name, val);
-  uis.bindClickEvents();
+  // 定制 click_text 字段
+  this.clickEventHandler(e, true);
+
 }
 
 UIS.fn.urlFixup = function(hostName, href, referrer) {
@@ -1216,11 +1220,27 @@ UIS.fn.logEvent = function(properties, block, callback) {
     }
 };
 
-
-UIS.fn.clickEventHandler = function(e) {
+/**
+ * [clickEventHandler description] 被 track 和 trackClicks 两个 API 调用
+ * @param  {[type]}  e                  [description]
+ * @param  {Boolean} isComstomClickText [description]
+ * @return {[type]}                     [description]
+ */
+UIS.fn.clickEventHandler = function(e, isComstomClickText) {
 
     // hack for IE
     e = e || window.event;
+
+    // 只有调用 track 才走这种逻辑，需要防止多次提交
+      if ( this.isTrackedClick ) {
+        this.isTrackedClick = false;
+        return
+      } else {
+        this.isTrackedClick = true
+        if (!isComstomClickText) this.isTrackedClick = false;
+      }
+
+
 
     var click = new UISEvent(this);
     // set event type
@@ -1234,18 +1254,15 @@ UIS.fn.clickEventHandler = function(e) {
     if (targ.hasOwnProperty && targ.hasOwnProperty('value') && targ.value.length > 0) {
         dom_value = targ.value;
     }
-    // 点击获取
-    // click.set('click_text', targ.innerText);
-    var click_text_value = uis.getOption('click_text')
-    click.set('click_text', click_text_value);
+    console.log('isComstomClickText:' + isComstomClickText)
+    // 设置点击时候的信息
+    if ( isComstomClickText ) {
+      var click_text_value = uis.getOption('click_text')
+      click.set('click_text', click_text_value);
+    } else {
+      click.set('click_text', targ.innerText);
+    }
 
-    // 点击 ->
-
-    // click.set('click_value', targ.innerText);
-    //click.setValue(this.findPosX(targ) + ',' + this.findPosY(targ));
-    // //clicked DOM element properties
-    // var targ = this._getTarget(e);
-    //
     // var dom_name = '(not set)';
     if (targ.hasOwnProperty && targ.hasOwnProperty('name') && targ.name.length > 0) {
         click.set('click_name', targ.name);
@@ -1301,21 +1318,28 @@ UIS.fn.clickEventHandler = function(e) {
     // this.click = full_click;
 };
 
-UIS.fn.bindClickEvents = function() {
-    if (!this.isClickTrackingEnabled) {
-        var that = this;
-        // Registers the handler for the before navigate event so that the dom stream can be logged
-        if (window.addEventListener) {
-            window.addEventListener('click', function(e) {
-                that.clickEventHandler(e);
-            }, false);
-        } else if (window.attachEvent) {
-            document.attachEvent('onclick', function(e) {
-                that.clickEventHandler(e);
-            });
-        }
-        this.isClickTrackingEnabled = true;
-    }
+/**
+ * [bindClickEvents description]
+ * @param  {Boolean} isComstomClickText [description]
+ *    true 定制 click_text 字段
+ *    false 不定制 click_text 字段
+ * @return {[type]}                     [description]
+ */
+UIS.fn.bindClickEvents = function(isComstomClickText) {
+  if (!this.isClickTrackingEnabled) {
+      var that = this;
+      // Registers the handler for the before navigate event so that the dom stream can be logged
+      if (window.addEventListener) {
+          window.addEventListener('click', function(e) {
+              that.clickEventHandler(e, isComstomClickText);
+          }, false);
+      } else if (window.attachEvent) {
+          document.attachEvent('onclick', function(e) {
+              that.clickEventHandler(e, isComstomClickText);
+          });
+      }
+      this.isClickTrackingEnabled = true;
+  }
 };
 
 /**
@@ -1324,7 +1348,8 @@ UIS.fn.bindClickEvents = function() {
  */
 UIS.fn.trackClicks = function( ) {
     // this.setOption('logClicksAsTheyHappen', true);
-    this.bindClickEvents();
+    // 不定制 click_text 字段
+    this.bindClickEvents( false );
 };
 
 /**
@@ -1531,7 +1556,9 @@ UIS.fn.trackError = function() {
                 event.set("error_js", data.url);
                 event.set("error_line", data.line);
                 event.set("error_col", data.col);
-                event.set("error_msg", data.msg);
+                // event.set("error_msg", data.msg);
+                // data.msg 字段会将 js 出错的完整信息都提交
+                event.set("error_msg", "JS 逻辑异常");
                 uis.logEvent(event.getProperties());
             }, 0)
             //return true;
@@ -1548,10 +1575,14 @@ UIS.fn.start = function(params) {
     if (params['siteId']){
       this.setOption("siteId", params['siteId']);
     }
-    // this.trackClicks();
+    // 会统计所有的点击事件，并触发信息提交
+    this.trackClicks();
     this.trackRouter();
     this.trackPageLoad();
     this.trackError();
+
+    // 1.只有项目中使用了 jquery 提供的 ajax 方法的时候，才使用 trackJqueryAjax 进行 http 信息统计
+    // 2.通用方案待确定
     if (window.$ && window.$.ajax){
       this.trackJqueryAjax(window.$);
     }

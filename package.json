@@ -1,6 +1,6 @@
 {
   "name": "iuap-insight",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "iuap-insight",
   "main": "webpack.config.js",
   "scripts": {
