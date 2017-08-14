@@ -56,6 +56,10 @@
 - 其他 API 请查看 UIS 对象
 
 
-## 温馨提示
+## TODO 状态
 
-- 使用 `.tranckJqueryAjax($)` 这个 API 之前需要提前引入 jquery ，并且使用了 $.ajax 。
+
+- [x] `click_text` 字段信息统计，主动设置 `track` 时不统计默认的 `trackClicks` 所提供的信息。
+- [x] `error_msg` 字段，`js` 报错的时候，提交的统计信息（给定固定的文案进行信息统计）
+- [ ] 未引用 `jq` 的时候未统计到信息（待下次版本进行方案处理），目前使用 `.tranckJqueryAjax($)` 这个 API 之前需要提前引入 jquery ，并且使用了 $.ajax 。
+- [x] track API 使用文档更新
