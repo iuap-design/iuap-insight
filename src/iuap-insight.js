@@ -1556,9 +1556,9 @@ UIS.fn.trackError = function() {
                 event.set("error_js", data.url);
                 event.set("error_line", data.line);
                 event.set("error_col", data.col);
-                // event.set("error_msg", data.msg);
+                event.set("error_msg", data.msg.toString());
                 // data.msg 字段会将 js 出错的完整信息都提交
-                event.set("error_msg", "JS 逻辑异常");
+                // event.set("error_msg", "JS 逻辑异常");
                 uis.logEvent(event.getProperties());
             }, 0)
             //return true;
