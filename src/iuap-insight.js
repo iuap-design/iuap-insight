@@ -1001,7 +1001,7 @@ UIS.fn.generateHiddenIframe = function(parentElement, data) {
     var iframe_name = 'uis-tracker-post-iframe';
 
     if (UIS.isIE() && UIS.getInternetExplorerVersion() < 9.0) {
-        var iframe = document.createElement('<iframe name="' + iframe_name + '" scr="about:blank" width="1" height="1"></iframe>');
+        var iframe = document.createElement('<iframe name="' + iframe_name + '" src="about:blank" width="1" height="1"></iframe>');
     } else {
         var iframe = document.createElement("iframe");
         iframe.setAttribute('name', iframe_name);
