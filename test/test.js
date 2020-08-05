@@ -1,4 +1,4 @@
-import TraceMonitor from './TraceMonitor';
+import TraceMonitor from '../src/monitor/TraceMonitor';
 
 // 1
 const trace0 = TraceMonitor.getInstance().createTrace('页面初始化');

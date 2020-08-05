@@ -12,8 +12,11 @@ import * as rrwebAPI from './rrweb'
 const monitor = TraceMonitor.getInstance()
 const uis = new UIS();
 
-window.uis = uis.default || {}
-window.rrweb = rrwebAPI.default || {}
+window.uis = uis || {}
+window.rrweb = rrwebAPI || {}
 window.monitor = monitor || {}
+
+uis.monitor = monitor
+uis.rrweb = rrweb
 
 export default uis
