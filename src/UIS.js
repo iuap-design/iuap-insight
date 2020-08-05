@@ -450,31 +450,22 @@ UIS.fn.clickEventHandler = function(e, isComstomClickText) {
       click.set('click_text', targ.innerText);
     }
 
-    // var dom_name = '(not set)';
-    if (targ.hasOwnProperty && targ.hasOwnProperty('name') && targ.name.length > 0) {
-        click.set('click_name', targ.name);
+    if (targ.attributes && targ.attributes.hasOwnProperty('name') && targ.attributes.name.value && targ.attributes.name.value.length > 0) {
+        click.set('click_name', targ.attributes.name.value);
     }
-    // click.set("dom_element_name", dom_name);
-    //
-    // var dom_value = '(not set)';
-    if (targ.hasOwnProperty && targ.hasOwnProperty('value') && targ.value.length > 0) {
-        // dom_value = targ.value;
+
+    if (targ.value && targ.value.length > 0) {
         click.set('click_value', targ.value);
     }
-    // click.set("dom_element_value", dom_value);
-    //
-    // var dom_id = '(not set)';
-    if (targ.hasOwnProperty && targ.hasOwnProperty('id') && targ.id.length > 0) {
+
+    if (targ.id && targ.id.length > 0) {
         click.set('click_id', targ.id);
     }
-    // click.set("dom_element_id", dom_id);
-    //
-    // var dom_class = '(not set)';
+
     if (targ.className && targ.className.length > 0) {
         click.set('click_class', targ.className);
     }
-    // click.set("dom_element_class", dom_class);
-    //
+
     click.set("click_tag", Utils.strtolower(targ.tagName));
 
     click.set('click_pos_x', this.findPosX(targ));

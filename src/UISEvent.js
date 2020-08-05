@@ -25,29 +25,32 @@ const UISEvent = function(uis) {
     this.id = '';
     // this.siteId = '';
     //this.set('timestamp', Math.round(new Date().getTime() / 1000));
-    this.set('site_id', uis.getOption('siteId'));
+    // this.set('site_id', uis.getOption('siteId'));
     // this.set('rec',1);
     // this.set('r',String(Math.random()).slice(2, 8));
-    this.set('client_ts', now.getTime());
+    // this.set('client_ts', now.getTime());
     // this.set('url',now.getSeconds());
     // this.set('urlref',now.getSeconds());
     // this.set('s',now.getSeconds());
-    if (userId)
-        this.set('user_id', userId);
-    this.set('visitor_id', cookieVisitorIdValues.uuid);
+    // if (userId)
+    //     this.set('user_id', userId);
+    // this.set('visitor_id', cookieVisitorIdValues.uuid);
     // this.set('_idts', cookieVisitorIdValues.createTs);
     // this.set('_idvc', cookieVisitorIdValues.visitCount);
     // this.set('_idn', cookieVisitorIdValues.newVisitor);
-    this.set('res', window.screen.width + ' * ' + window.screen.height);
-    this.set('res_x', window.screen.width);
-    this.set('res_y', window.screen.height);
-    this.set('page_title', document.title);
+    // this.set('res', window.screen.width + ' * ' + window.screen.height);
+    // this.set('res_x', window.screen.width);
+    // this.set('res_y', window.screen.height);
+    // this.set('page_title', document.title);
     var locationArray = uis.urlFixup(document.domain, window.location.href, uis.getReferrer());
     var configReferrerUrl = decodeURIComponent(locationArray[2]);
-    this.set('url', window.location.href);
-    if (configReferrerUrl)
-        this.set("url_ref", configReferrerUrl);
-    this.set("host", window.location.host);
+    // this.set('url', window.location.href);
+    // if (configReferrerUrl)
+    //     this.set("url_ref", configReferrerUrl);
+    // this.set("host", window.location.host);
+
+    // TODO:UI元数据 (非必须，仅针对mdf节点)
+    // this.set("state", {})
 
 
 }
