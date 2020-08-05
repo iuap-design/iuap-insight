@@ -475,7 +475,7 @@ UIS.fn.clickEventHandler = function(e, isComstomClickText) {
     }
     // click.set("dom_element_class", dom_class);
     //
-    click.set("click_tag", UIS.strtolower(targ.tagName));
+    click.set("click_tag", Utils.strtolower(targ.tagName));
 
     click.set('click_pos_x', this.findPosX(targ));
     click.set('click_pos_y', this.findPosY(targ));
