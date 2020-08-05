@@ -1,4 +1,4 @@
-import { hash } from './utils'
+import { hash, getCookie, is_object, setCookie, isDefined } from './utils'
 
 /**
  *事件类
@@ -110,9 +110,9 @@ UISEvent.prototype = {
             nowTs = Math.round(now.getTime() / 1000),
             idCookieName = this.uis.getCookieName('id'),
             visitorIdCookieName = this.uis.getCookieName('visitorId'),
-            id = UIS.getCookie(idCookieName),
+            id = getCookie(idCookieName),
             cookieValue,
-            visitorId = UIS.getCookie(visitorIdCookieName);
+            visitorId = getCookie(visitorIdCookieName);
         // Visitor ID cookie found
         if (id) {
             cookieValue = id.split('.');
@@ -124,7 +124,7 @@ UISEvent.prototype = {
 
         if (!visitorId) {
             visitorId = this.generateRandomUuid();
-            UIS.setCookie(visitorIdCookieName, visitorId)
+            setCookie(visitorIdCookieName, visitorId)
         }
         // No visitor ID cookie, let's create a new one
         cookieValue = [
@@ -155,7 +155,7 @@ UISEvent.prototype = {
             lastVisitTs = cookieVisitorIdValue[5];
 
         // case migrating from pre-1.5 cookies
-        if (!UIS.isDefined(cookieVisitorIdValue[6])) {
+        if (!(cookieVisitorIdValue[6])) {
             cookieVisitorIdValue[6] = "";
         }
 
@@ -175,12 +175,12 @@ UISEvent.prototype = {
         return this.getValuesFromVisitorIdCookie().uuid;
     },
     loadReferrerAttributionCookie: function() {
-        var cookie = UIS.getCookie(this.uis.getCookieName('ref'));
+        var cookie = getCookie(this.uis.getCookieName('ref'));
 
         if (cookie.length) {
             try {
                 cookie = JSON.parse(cookie);
-                if (UIS.is_object(cookie)) {
+                if (is_object(cookie)) {
                     return cookie;
                 }
             } catch (ignore) {

@@ -6,7 +6,14 @@
  */
 
 import UIS from './UIS.js'
+import TraceMonitor from './monitor/traceMonitor.js'
+import * as rrwebAPI from './rrweb'
 
+const monitor = TraceMonitor.getInstance()
 const uis = new UIS();
-window.uis = window.uis || {}
+
+window.uis = uis.default || {}
+window.rrweb = rrwebAPI.default || {}
+window.monitor = monitor || {}
+
 export default uis
