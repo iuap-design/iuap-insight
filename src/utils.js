@@ -1,0 +1,461 @@
+
+export function utf8_encode(argString) {
+    return decodeURI(encodeURIComponent(argString));
+}
+
+export function hash(str) {
+    // +   original by: Webtoolkit.info (http://www.webtoolkit.info/)
+    // + namespaced by: Michael White (http://getsprink.com)
+    // +      input by: Brett Zamir (http://brett-zamir.me)
+    // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+    // +   jslinted by: Anthon Pang (http://piwik.org)
+
+    var
+        rotate_left = function(n, s) {
+            return (n << s) | (n >>> (32 - s));
+        },
+
+        cvt_hex = function(val) {
+            var strout = '',
+                i,
+                v;
+
+            for (i = 7; i >= 0; i--) {
+                v = (val >>> (i * 4)) & 0x0f;
+                strout += v.toString(16);
+            }
+
+            return strout;
+        },
+
+        blockstart,
+        i,
+        j,
+        W = [],
+        H0 = 0x67452301,
+        H1 = 0xEFCDAB89,
+        H2 = 0x98BADCFE,
+        H3 = 0x10325476,
+        H4 = 0xC3D2E1F0,
+        A,
+        B,
+        C,
+        D,
+        E,
+        temp,
+        str_len,
+        word_array = [];
+
+    str = utf8_encode(str);
+    str_len = str.length;
+
+    for (i = 0; i < str_len - 3; i += 4) {
+        j = str.charCodeAt(i) << 24 | str.charCodeAt(i + 1) << 16 |
+            str.charCodeAt(i + 2) << 8 | str.charCodeAt(i + 3);
+        word_array.push(j);
+    }
+
+    switch (str_len & 3) {
+        case 0:
+            i = 0x080000000;
+            break;
+        case 1:
+            i = str.charCodeAt(str_len - 1) << 24 | 0x0800000;
+            break;
+        case 2:
+            i = str.charCodeAt(str_len - 2) << 24 | str.charCodeAt(str_len - 1) << 16 | 0x08000;
+            break;
+        case 3:
+            i = str.charCodeAt(str_len - 3) << 24 | str.charCodeAt(str_len - 2) << 16 | str.charCodeAt(str_len - 1) << 8 | 0x80;
+            break;
+    }
+
+    word_array.push(i);
+
+    while ((word_array.length & 15) !== 14) {
+        word_array.push(0);
+    }
+
+    word_array.push(str_len >>> 29);
+    word_array.push((str_len << 3) & 0x0ffffffff);
+
+    for (blockstart = 0; blockstart < word_array.length; blockstart += 16) {
+        for (i = 0; i < 16; i++) {
+            W[i] = word_array[blockstart + i];
+        }
+
+        for (i = 16; i <= 79; i++) {
+            W[i] = rotate_left(W[i - 3] ^ W[i - 8] ^ W[i - 14] ^ W[i - 16], 1);
+        }
+
+        A = H0;
+        B = H1;
+        C = H2;
+        D = H3;
+        E = H4;
+
+        for (i = 0; i <= 19; i++) {
+            temp = (rotate_left(A, 5) + ((B & C) | (~B & D)) + E + W[i] + 0x5A827999) & 0x0ffffffff;
+            E = D;
+            D = C;
+            C = rotate_left(B, 30);
+            B = A;
+            A = temp;
+        }
+
+        for (i = 20; i <= 39; i++) {
+            temp = (rotate_left(A, 5) + (B ^ C ^ D) + E + W[i] + 0x6ED9EBA1) & 0x0ffffffff;
+            E = D;
+            D = C;
+            C = rotate_left(B, 30);
+            B = A;
+            A = temp;
+        }
+
+        for (i = 40; i <= 59; i++) {
+            temp = (rotate_left(A, 5) + ((B & C) | (B & D) | (C & D)) + E + W[i] + 0x8F1BBCDC) & 0x0ffffffff;
+            E = D;
+            D = C;
+            C = rotate_left(B, 30);
+            B = A;
+            A = temp;
+        }
+
+        for (i = 60; i <= 79; i++) {
+            temp = (rotate_left(A, 5) + (B ^ C ^ D) + E + W[i] + 0xCA62C1D6) & 0x0ffffffff;
+            E = D;
+            D = C;
+            C = rotate_left(B, 30);
+            B = A;
+            A = temp;
+        }
+
+        H0 = (H0 + A) & 0x0ffffffff;
+        H1 = (H1 + B) & 0x0ffffffff;
+        H2 = (H2 + C) & 0x0ffffffff;
+        H3 = (H3 + D) & 0x0ffffffff;
+        H4 = (H4 + E) & 0x0ffffffff;
+    }
+
+    temp = cvt_hex(H0) + cvt_hex(H1) + cvt_hex(H2) + cvt_hex(H3) + cvt_hex(H4);
+
+    return temp.toLowerCase();
+}
+
+
+/**
+ * 判断是否是数组
+ * @param input
+ * @returns {boolean}
+ */
+export const is_array = function(input) {
+    return typeof(input) == 'object' && (input instanceof Array);
+};
+
+/**
+ * 是否是对象
+ * @param mixed_var
+ * @returns {boolean}
+ */
+export const is_object = function(mixed_var) {
+    if (mixed_var instanceof Array) {
+        return false;
+    } else {
+        return (mixed_var !== null) && (typeof(mixed_var) == 'object');
+    }
+};
+
+export const isDefined = function(property) {
+    var propertyType = typeof property;
+    return propertyType !== 'undefined';
+};
+
+export const strtolower = function(str) {
+    return (str + '').toLowerCase();
+};
+
+export const clone = function(mixed) {
+    var newObj = (mixed instanceof Array) ? [] : {};
+    for (var i in mixed) {
+        if (mixed[i] && (typeof mixed[i] == "object")) {
+            newObj[i] = clone(mixed[i]);
+        } else {
+            newObj[i] = mixed[i];
+        }
+    }
+    return newObj;
+};
+
+export const isIE = function() {
+    if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)) {
+        return true;
+    }
+};
+
+export const getInternetExplorerVersion = function() {
+
+    var rv = -1; // Return value assumes failure.
+    if (navigator.appName == 'Microsoft Internet Explorer') {
+        var ua = navigator.userAgent;
+        var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+        if (re.exec(ua) != null)
+            rv = parseFloat(RegExp.$1);
+    }
+    return rv;
+};
+
+export const strpos = function(haystack, needle, offset) {
+    var i = (haystack + '').indexOf(needle, (offset || 0));
+    return i === -1 ? false : i;
+};
+
+export const trim = function(str, charlist) {
+    var whitespace, l = 0,
+        i = 0;
+    str += '';
+    if (!charlist) {
+        // default list
+        whitespace = " \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000";
+    } else {
+        charlist += '';
+        whitespace = charlist.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g, '$1');
+    }
+
+    l = str.length;
+    for (i = 0; i < l; i++) {
+        if (whitespace.indexOf(str.charAt(i)) === -1) {
+            str = str.substring(i);
+            break;
+        }
+    }
+
+    l = str.length;
+    for (i = l - 1; i >= 0; i--) {
+        if (whitespace.indexOf(str.charAt(i)) === -1) {
+            str = str.substring(0, i + 1);
+            break;
+        }
+    }
+    return whitespace.indexOf(str.charAt(0)) === -1 ? str : '';
+};
+
+
+
+export const setCookie = function(name, value, days, path, domain, secure) {
+    var date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+
+    document.cookie = name + "=" + escape(value) +
+        ((days) ? "; expires=" + date.toGMTString() : "") +
+        ((path) ? "; path=" + path : "") +
+        ((domain) ? "; domain=" + domain : "") +
+        ((secure) ? "; secure" : "");
+};
+
+export const readAllCookies = function() {
+    var jar = {};
+    var ca = document.cookie.split(';');
+
+    if (ca) {
+        for (var i = 0; i < ca.length; i++) {
+
+            var cat = trim(ca[i]);
+            var pos = strpos(cat, '=');
+            var key = cat.substring(0, pos);
+            var value = cat.substring(pos + 1, cat.length);
+            if (!jar.hasOwnProperty(key)) {
+                jar[key] = [];
+            }
+            jar[key].push(value);
+        }
+        return jar;
+    }
+};
+
+export const getCookie = function(name) {
+    var jar = readAllCookies();
+    if (jar) {
+        if (jar.hasOwnProperty(name)) {
+            return jar[name][0];
+        } else {
+            return '';
+        }
+    }
+};
+
+export const urlEncode = function(str) {
+    str = (str + '').toString();
+    return encodeURIComponent(str).replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/\*/g, '%2A').replace(/%20/g, '+');
+};
+
+export const urlDecode = function(str) {
+    return decodeURIComponent(str.replace(/\+/g, '%20'));
+};
+
+export const sprintf = function() {
+    var regex = /%%|%(\d+\$)?([-+\'#0 ]*)(\*\d+\$|\*|\d+)?(\.(\*\d+\$|\*|\d+))?([scboxXuidfegEG])/g;
+    var a = arguments,
+        i = 0,
+        format = a[i++];
+
+    // pad()
+    var pad = function(str, len, chr, leftJustify) {
+        if (!chr) {
+            chr = ' ';
+        }
+        var padding = (str.length >= len) ? '' : Array(1 + len - str.length >>> 0).join(chr);
+        return leftJustify ? str + padding : padding + str;
+    };
+
+    // justify()
+    var justify = function(value, prefix, leftJustify, minWidth, zeroPad, customPadChar) {
+        var diff = minWidth - value.length;
+        if (diff > 0) {
+            if (leftJustify || !zeroPad) {
+                value = pad(value, minWidth, customPadChar, leftJustify);
+            } else {
+                value = value.slice(0, prefix.length) + pad('', diff, '0', true) + value.slice(prefix.length);
+            }
+        }
+        return value;
+    };
+
+    // formatBaseX()
+    var formatBaseX = function(value, base, prefix, leftJustify, minWidth, precision, zeroPad) {
+        // Note: casts negative numbers to positive ones
+        var number = value >>> 0;
+        prefix = prefix && number && {
+            '2': '0b',
+            '8': '0',
+            '16': '0x'
+        }[base] || '';
+        value = prefix + pad(number.toString(base), precision || 0, '0', false);
+        return justify(value, prefix, leftJustify, minWidth, zeroPad);
+    };
+
+    // formatString()
+    var formatString = function(value, leftJustify, minWidth, precision, zeroPad, customPadChar) {
+        if (precision != null) {
+            value = value.slice(0, precision);
+        }
+        return justify(value, '', leftJustify, minWidth, zeroPad, customPadChar);
+    };
+
+    // doFormat()
+    var doFormat = function(substring, valueIndex, flags, minWidth, _, precision, type) {
+        var number;
+        var prefix;
+        var method;
+        var textTransform;
+        var value;
+
+        if (substring == '%%') {
+            return '%';
+        }
+
+        // parse flags
+        var leftJustify = false,
+            positivePrefix = '',
+            zeroPad = false,
+            prefixBaseX = false,
+            customPadChar = ' ';
+        var flagsl = flags.length;
+        for (var j = 0; flags && j < flagsl; j++) {
+            switch (flags.charAt(j)) {
+                case ' ':
+                    positivePrefix = ' ';
+                    break;
+                case '+':
+                    positivePrefix = '+';
+                    break;
+                case '-':
+                    leftJustify = true;
+                    break;
+                case "'":
+                    customPadChar = flags.charAt(j + 1);
+                    break;
+                case '0':
+                    zeroPad = true;
+                    break;
+                case '#':
+                    prefixBaseX = true;
+                    break;
+            }
+        }
+
+        // parameters may be null, undefined, empty-string or real valued
+        // we want to ignore null, undefined and empty-string values
+        if (!minWidth) {
+            minWidth = 0;
+        } else if (minWidth == '*') {
+            minWidth = +a[i++];
+        } else if (minWidth.charAt(0) == '*') {
+            minWidth = +a[minWidth.slice(1, -1)];
+        } else {
+            minWidth = +minWidth;
+        }
+
+        // Note: undocumented perl feature:
+        if (minWidth < 0) {
+            minWidth = -minWidth;
+            leftJustify = true;
+        }
+
+        if (!isFinite(minWidth)) {
+            throw new Error('sprintf: (minimum-)width must be finite');
+        }
+
+        if (!precision) {
+            precision = 'fFeE'.indexOf(type) > -1 ? 6 : (type == 'd') ? 0 : undefined;
+        } else if (precision == '*') {
+            precision = +a[i++];
+        } else if (precision.charAt(0) == '*') {
+            precision = +a[precision.slice(1, -1)];
+        } else {
+            precision = +precision;
+        }
+
+        // grab value using valueIndex if required?
+        value = valueIndex ? a[valueIndex.slice(0, -1)] : a[i++];
+
+        switch (type) {
+            case 's':
+                return formatString(String(value), leftJustify, minWidth, precision, zeroPad, customPadChar);
+            case 'c':
+                return formatString(String.fromCharCode(+value), leftJustify, minWidth, precision, zeroPad);
+            case 'b':
+                return formatBaseX(value, 2, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
+            case 'o':
+                return formatBaseX(value, 8, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
+            case 'x':
+                return formatBaseX(value, 16, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
+            case 'X':
+                return formatBaseX(value, 16, prefixBaseX, leftJustify, minWidth, precision, zeroPad).toUpperCase();
+            case 'u':
+                return formatBaseX(value, 10, prefixBaseX, leftJustify, minWidth, precision, zeroPad);
+            case 'i':
+            case 'd':
+                number = parseInt(+value, 10);
+                prefix = number < 0 ? '-' : positivePrefix;
+                value = prefix + pad(String(Math.abs(number)), precision, '0', false);
+                return justify(value, prefix, leftJustify, minWidth, zeroPad);
+            case 'e':
+            case 'E':
+            case 'f':
+            case 'F':
+            case 'g':
+            case 'G':
+                number = +value;
+                prefix = number < 0 ? '-' : positivePrefix;
+                method = ['toExponential', 'toFixed', 'toPrecision']['efg'.indexOf(type.toLowerCase())];
+                textTransform = ['toString', 'toUpperCase']['eEfFgG'.indexOf(type) % 2];
+                value = prefix + Math.abs(number)[method](precision);
+                return justify(value, prefix, leftJustify, minWidth, zeroPad)[textTransform]();
+            default:
+                return substring;
+        }
+    };
+
+    return format.replace(regex, doFormat);
+
+};
