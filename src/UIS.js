@@ -2,6 +2,20 @@ import UISEvent from './UISEvent'
 import timing from './timing/timingjs'
 import * as Utils from './utils'
 
+
+const TYPES = {
+    timing: "timing",
+    device: "device",
+    httpError: "httpError",
+    httpInfo: "httpInfo",
+    event: "event",
+    httpResourceError: "httpResourceError",
+    websocketError: "websocketError",
+    unhandledRejectionError: "unhandledRejectionError",
+    scirptError: "scirptError",
+    record: "record",
+};
+
 /**
  * UIS 基类对象
  * API：trackEvent、treackError、start等
@@ -408,6 +422,89 @@ UIS.fn.logEvent = function(properties, block, callback) {
 };
 
 /**
+ * 发送请求，记录日志
+ *
+ * @param properties
+ * @param block
+ * @param callback
+ */
+UIS.fn.report = function (data, block, callback) {
+
+    let generalInfo = this.getGeneralInfo();
+    let reportData = {
+        ...generalInfo,
+        ...data
+    }
+    
+    //每次发送请求之前，检查是否有jqueryAjax的track
+    if (this.isTrackingJqueryAjax === false){
+      if (window.$ && window.$.ajax){
+        this.trackJqueryAjax(window.$);
+      }
+    }
+
+    var url = this._parseRequestUrl(reportData);
+    var limit = this.getOption('getRequestCharacterLimit');
+    if (url.length > limit) {
+        //this.cdPost( this.prepareRequestData( properties ) );
+        var data = this.prepareRequestData(reportData);
+        this.cdPost(data);
+    } else {
+        UIS.debug('url : %s', url);
+        var image = new Image(1, 1);
+        //expireDateTime = now.getTime() + delay;
+        image.onLoad = function() {};
+        image.src = url;
+        UIS.debug('Inserted web bug for %s');
+    }
+    if (callback && (typeof(callback) === "function")) {
+        callback();
+    }
+};
+
+/**
+ * 获取上报通用信息
+ */
+UIS.fn.getGeneralInfo = function () {
+    let general = {
+        // 全链路追踪的唯一id
+        traceid: "",
+        // 全链路追踪的name
+        trace_name: "",
+        // 录制的唯一id ,从cookie里取值
+        uid: Utils.getCookie("mdd_monitor_uid"),
+        spanId: "",
+        pSpanId: "",
+        // 打印信息
+        msg: "",
+        // 当前时间
+        ts: "",
+        // Cookie yonyou_uid
+        userId: Utils.getCookie("yonyou_uid"),
+        // Cookie tenantid
+        tenantId: Utils.getCookie("tenantid"),
+        // span名称 查询 新增
+        name: "",
+        // 函数名
+        remote_method: "",
+
+        // 应用appid
+        site_id: "",
+        page_title: "",
+        // 节点URL
+        url: "",
+        // 节点父级URL
+        url_ref: "",
+        // 节点编码
+        serviceCode: "",
+        // 节点名称
+        serviceName: "",
+    };
+
+    return general;
+};
+
+/**
  * [clickEventHandler description] 被 track 和 trackClicks 两个 API 调用
  * @param  {[type]}  e                  [description]
  * @param  {Boolean} isComstomClickText [description]
@@ -472,7 +569,10 @@ UIS.fn.clickEventHandler = function(e, isComstomClickText) {
     click.set('click_pos_y', this.findPosY(targ));
 
  
-    this.logEvent(click.getProperties());
+    let reportData = {
+        [TYPES.event]: click.getProperties()
+    }
+    this.report(reportData)
 
 };
 
