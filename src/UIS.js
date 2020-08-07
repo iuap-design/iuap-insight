@@ -435,7 +435,7 @@ UIS.fn.report = function (data, block, callback) {
         ...generalInfo,
         ...data
     }
-    
+
     //每次发送请求之前，检查是否有jqueryAjax的track
     if (this.isTrackingJqueryAjax === false){
       if (window.$ && window.$.ajax){
@@ -761,7 +761,12 @@ UIS.fn.trackPageLoad = function() {
         event.set('t_white', myTime.t_white || 0);
         event.set('t_all', myTime.t_all || 0);
         event.set('ajax_tm', myTime.t_all || 0);
-        this.logEvent(event.getProperties());
+        let reportData = {
+            [TYPES.timing]: event.getProperties()
+        }
+        this.report(reportData)
+        // this.logEvent(event.getProperties());
+
     } else {
         setTimeout(function() {
             that.trackPageLoad()
@@ -810,14 +815,22 @@ UIS.fn.trackError = function() {
                 }
                 var uis = window.uis || new UIS();
                 var event = new UISEvent(uis);
-                event.setEventType("jserror");
-                event.set("error_js", data.url);
-                event.set("error_line", data.line);
-                event.set("error_col", data.col);
-                event.set("error_msg", data.msg.toString());
+                event.setEventType(TYPES.scirptError);
+                event.set("fileName", data.url);
+                event.set("lineNumber", data.line);
+                event.set("columnNumber", data.col);
+                event.set("exception", msg);
+                event.set("stacktrace", data.msg.toString());
                 // data.msg 字段会将 js 出错的完整信息都提交
                 // event.set("error_msg", "JS 逻辑异常");
-                uis.logEvent(event.getProperties());
+                // uis.logEvent(event.getProperties());
+
+                let reportData = {
+                    [TYPES.scirptError]: event.getProperties()
+                }
+                console.log("reportData", reportData)
+                uis.report(reportData)
+
             }, 0)
             //return true;
     };
@@ -839,7 +852,7 @@ UIS.fn.start = function(params) {
     }
     // 会统计所有的点击事件，并触发信息提交
     this.trackClicks();
-    this.trackRouter();
+    // this.trackRouter();
     this.trackPageLoad();
     this.trackError();
 
