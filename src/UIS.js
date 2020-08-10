@@ -433,8 +433,10 @@ UIS.fn.report = function (data, block, callback) {
     let generalInfo = this.getGeneralInfo();
     let reportData = {
         ...generalInfo,
+        device: this.getDevice(),
         ...data
     }
+    console.log("reportData", reportData)
 
     //每次发送请求之前，检查是否有jqueryAjax的track
     if (this.isTrackingJqueryAjax === false){
@@ -502,6 +504,52 @@ UIS.fn.getGeneralInfo = function () {
     };
 
     return general;
+};
+
+/**
+ * 获取设备信息
+ */
+UIS.fn.getDevice = function () {
+    var device = new UISEvent(this);
+    var action_id = device.generateRandomUuid();
+
+    device.setEventType("device");
+    device.setAction(action_id);
+
+    let info = Utils.getInfo()
+    if (info) {
+        // 浏览器名称
+        device.set('browserName', info.name);
+
+        // 浏览器版本
+        device.set('browser', info.fullVersion);
+
+        // 操作系统名称
+        device.set('osName', info.os);
+
+        // 操作系统版本
+        // device.set('os', "");
+    }
+
+    // 页面URL
+    device.set('url', window.location.href);
+
+    // 用户ip
+    // device.set('ip', "");
+
+    // 设备类型
+    device.set('logtype', "client");
+
+    // 分辨率
+    device.set('res', `${window.screen.width}x${window.screen.height}`);
+
+    // 当前屏幕宽度
+    device.set('res_x', window.screen.width);
+
+    // 当前屏幕高度
+    device.set('res_y', window.screen.height);
+
+    return device.getProperties()
 };
 
 /**
