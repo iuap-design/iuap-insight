@@ -693,7 +693,7 @@ UIS.fn.trackJqueryAjax = function(jq) {
             }
             return data;
         }
-        setting.complete = function(data, textStatus, request) {
+        setting.complete = function(data, textStatus) {
             //var oneTime = new Date().getTime();
             var ajax_id = data.getResponseHeader("txID");
             var actionId = data.getResponseHeader("Action-Id");
@@ -706,15 +706,27 @@ UIS.fn.trackJqueryAjax = function(jq) {
             var ajax_timing_cb = twoTime - begin;
             var event = new UISEvent(self);
 
-            event.setEventType("ajax");
-            event.setAction(actionId);
-            event.set('ajax_id', ajax_id);
-            event.set('content_length', clength || 0);
-            event.set('ajax_tm', ajax_timing || 0);
-            event.set('ajax_tm_cb', ajax_timing_cb || 0);
+            // event.setEventType("ajax");
+            // event.setAction(actionId);
+            // event.set('ajax_id', ajax_id);
+            // event.set('content_length', clength || 0);
+            // event.set('ajax_tm', ajax_timing || 0);
+            // event.set('ajax_tm_cb', ajax_timing_cb || 0);
 
-            event.set('url_ajax', url);
-            self.logEvent(event.getProperties())
+            event.set('http_req_url', url1);
+            if (url1.split("?").length > 1) {
+                event.set('http_req_queryString',url1.split("?")[1]);
+            }
+            event.set('http_req_method', setting.type || "GET");
+            event.set('http_req_body', setting.data);
+            event.set('http_res_status', data.status);
+            event.set('http_res_statusText', textStatus);
+            event.set('http_res_body', data.responseText);
+
+            let reportData = {
+                [TYPES.httpInfo]: event.getProperties()
+            }
+            self.report(reportData)
         };
         return ajaxBack(url1, setting);
     }

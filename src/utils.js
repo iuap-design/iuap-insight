@@ -558,3 +558,27 @@ export const getInfo = function (userAgent) {
         os: os
     };
 }
+
+/**
+ * 转化对象为query
+ * @param data
+ * @returns {*}
+ */
+export function transToQuery (data) {
+    if (typeof data === 'string') {
+        return `?${data}`
+    }
+    let query = '?';
+    if (data instanceof Object) {
+        let keyAry = Object.keys(data);
+        for (let key in data) {
+            if (keyAry[keyAry.length - 1] === key) {
+                query = `${query}${key}=${data[key]}`;
+            } else {
+                query = `${query}${key}=${data[key]}&`;
+            }
+
+        }
+    }
+    return query;
+}
