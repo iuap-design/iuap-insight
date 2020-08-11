@@ -5,7 +5,7 @@ module.exports = {
     entry: './src/index.js',
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'iuap-insight.js',
+      filename: 'iuap-insight.min.js',
       library: 'uis',
       libraryTarget: 'umd',
     },

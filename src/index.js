@@ -9,6 +9,9 @@ import UIS from './UIS.js'
 import TraceMonitor from './monitor/traceMonitor.js'
 import * as rrwebAPI from './rrweb'
 
+import {hook, unHook} from "./request-hook/ajax-hook";
+import {proxy, unProxy} from "./request-hook/proxy-hook";
+
 const monitor = TraceMonitor.getInstance()
 const uis = new UIS();
 
@@ -18,5 +21,7 @@ window.monitor = monitor || {}
 
 uis.monitor = monitor
 uis.rrweb = rrweb
+
+Object.assign(uis, {hook, unHook, proxy, unProxy})
 
 export default uis
