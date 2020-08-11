@@ -2,6 +2,20 @@ import UISEvent from './UISEvent'
 import timing from './timing/timingjs'
 import * as Utils from './utils'
 
+
+const TYPES = {
+    timing: "timing",
+    device: "device",
+    httpError: "httpError",
+    httpInfo: "httpInfo",
+    event: "event",
+    httpResourceError: "httpResourceError",
+    websocketError: "websocketError",
+    unhandledRejectionError: "unhandledRejectionError",
+    scirptError: "scirptError",
+    record: "record",
+};
+
 /**
  * UIS 基类对象
  * API：trackEvent、treackError、start等
@@ -408,6 +422,137 @@ UIS.fn.logEvent = function(properties, block, callback) {
 };
 
 /**
+ * 发送请求，记录日志
+ *
+ * @param properties
+ * @param block
+ * @param callback
+ */
+UIS.fn.report = function (data, block, callback) {
+
+    let generalInfo = this.getGeneralInfo();
+    let reportData = {
+        ...generalInfo,
+        device: this.getDevice(),
+        ...data
+    }
+    console.log("reportData", reportData)
+
+    //每次发送请求之前，检查是否有jqueryAjax的track
+    if (this.isTrackingJqueryAjax === false){
+      if (window.$ && window.$.ajax){
+        this.trackJqueryAjax(window.$);
+      }
+    }
+
+    var url = this._parseRequestUrl(reportData);
+    var limit = this.getOption('getRequestCharacterLimit');
+    if (url.length > limit) {
+        //this.cdPost( this.prepareRequestData( properties ) );
+        var data = this.prepareRequestData(reportData);
+        this.cdPost(data);
+    } else {
+        UIS.debug('url : %s', url);
+        var image = new Image(1, 1);
+        //expireDateTime = now.getTime() + delay;
+        image.onLoad = function() {};
+        image.src = url;
+        UIS.debug('Inserted web bug for %s');
+    }
+    if (callback && (typeof(callback) === "function")) {
+        callback();
+    }
+};
+
+/**
+ * 获取上报通用信息
+ */
+UIS.fn.getGeneralInfo = function () {
+    let general = {
+        // 全链路追踪的唯一id
+        traceid: "",
+        // 全链路追踪的name
+        trace_name: "",
+        // 录制的唯一id ,从cookie里取值
+        uid: Utils.getCookie("mdd_monitor_uid"),
+        spanId: "",
+        pSpanId: "",
+        // 打印信息
+        msg: "",
+        // 当前时间
+        ts: "",
+        // Cookie yonyou_uid
+        userId: Utils.getCookie("yonyou_uid"),
+        // Cookie tenantid
+        tenantId: Utils.getCookie("tenantid"),
+        // span名称 查询 新增
+        name: "",
+        // 函数名
+        remote_method: "",
+
+        // 应用appid
+        site_id: "",
+        page_title: "",
+        // 节点URL
+        url: "",
+        // 节点父级URL
+        url_ref: "",
+        // 节点编码
+        serviceCode: "",
+        // 节点名称
+        serviceName: "",
+    };
+
+    return general;
+};
+
+/**
+ * 获取设备信息
+ */
+UIS.fn.getDevice = function () {
+    var device = new UISEvent(this);
+    var action_id = device.generateRandomUuid();
+
+    device.setEventType("device");
+    device.setAction(action_id);
+
+    let info = Utils.getInfo()
+    if (info) {
+        // 浏览器名称
+        device.set('browserName', info.name);
+
+        // 浏览器版本
+        device.set('browser', info.fullVersion);
+
+        // 操作系统名称
+        device.set('osName', info.os);
+
+        // 操作系统版本
+        // device.set('os', "");
+    }
+
+    // 页面URL
+    device.set('url', window.location.href);
+
+    // 用户ip
+    // device.set('ip', "");
+
+    // 设备类型
+    device.set('logtype', "client");
+
+    // 分辨率
+    device.set('res', `${window.screen.width}x${window.screen.height}`);
+
+    // 当前屏幕宽度
+    device.set('res_x', window.screen.width);
+
+    // 当前屏幕高度
+    device.set('res_y', window.screen.height);
+
+    return device.getProperties()
+};
+
+/**
  * [clickEventHandler description] 被 track 和 trackClicks 两个 API 调用
  * @param  {[type]}  e                  [description]
  * @param  {Boolean} isComstomClickText [description]
@@ -450,38 +595,32 @@ UIS.fn.clickEventHandler = function(e, isComstomClickText) {
       click.set('click_text', targ.innerText);
     }
 
-    // var dom_name = '(not set)';
-    if (targ.hasOwnProperty && targ.hasOwnProperty('name') && targ.name.length > 0) {
-        click.set('click_name', targ.name);
+    if (targ.attributes && targ.attributes.hasOwnProperty('name') && targ.attributes.name.value && targ.attributes.name.value.length > 0) {
+        click.set('click_name', targ.attributes.name.value);
     }
-    // click.set("dom_element_name", dom_name);
-    //
-    // var dom_value = '(not set)';
-    if (targ.hasOwnProperty && targ.hasOwnProperty('value') && targ.value.length > 0) {
-        // dom_value = targ.value;
+
+    if (targ.value && targ.value.length > 0) {
         click.set('click_value', targ.value);
     }
-    // click.set("dom_element_value", dom_value);
-    //
-    // var dom_id = '(not set)';
-    if (targ.hasOwnProperty && targ.hasOwnProperty('id') && targ.id.length > 0) {
+
+    if (targ.id && targ.id.length > 0) {
         click.set('click_id', targ.id);
     }
-    // click.set("dom_element_id", dom_id);
-    //
-    // var dom_class = '(not set)';
+
     if (targ.className && targ.className.length > 0) {
         click.set('click_class', targ.className);
     }
-    // click.set("dom_element_class", dom_class);
-    //
+
     click.set("click_tag", Utils.strtolower(targ.tagName));
 
     click.set('click_pos_x', this.findPosX(targ));
     click.set('click_pos_y', this.findPosY(targ));
 
  
-    this.logEvent(click.getProperties());
+    let reportData = {
+        [TYPES.event]: click.getProperties()
+    }
+    this.report(reportData)
 
 };
 
@@ -554,7 +693,7 @@ UIS.fn.trackJqueryAjax = function(jq) {
             }
             return data;
         }
-        setting.complete = function(data, textStatus, request) {
+        setting.complete = function(data, textStatus) {
             //var oneTime = new Date().getTime();
             var ajax_id = data.getResponseHeader("txID");
             var actionId = data.getResponseHeader("Action-Id");
@@ -567,15 +706,27 @@ UIS.fn.trackJqueryAjax = function(jq) {
             var ajax_timing_cb = twoTime - begin;
             var event = new UISEvent(self);
 
-            event.setEventType("ajax");
-            event.setAction(actionId);
-            event.set('ajax_id', ajax_id);
-            event.set('content_length', clength || 0);
-            event.set('ajax_tm', ajax_timing || 0);
-            event.set('ajax_tm_cb', ajax_timing_cb || 0);
+            // event.setEventType("ajax");
+            // event.setAction(actionId);
+            // event.set('ajax_id', ajax_id);
+            // event.set('content_length', clength || 0);
+            // event.set('ajax_tm', ajax_timing || 0);
+            // event.set('ajax_tm_cb', ajax_timing_cb || 0);
 
-            event.set('url_ajax', url);
-            self.logEvent(event.getProperties())
+            event.set('http_req_url', url1);
+            if (url1.split("?").length > 1) {
+                event.set('http_req_queryString',url1.split("?")[1]);
+            }
+            event.set('http_req_method', setting.type || "GET");
+            event.set('http_req_body', setting.data);
+            event.set('http_res_status', data.status);
+            event.set('http_res_statusText', textStatus);
+            event.set('http_res_body', data.responseText);
+
+            let reportData = {
+                [TYPES.httpInfo]: event.getProperties()
+            }
+            self.report(reportData)
         };
         return ajaxBack(url1, setting);
     }
@@ -670,7 +821,12 @@ UIS.fn.trackPageLoad = function() {
         event.set('t_white', myTime.t_white || 0);
         event.set('t_all', myTime.t_all || 0);
         event.set('ajax_tm', myTime.t_all || 0);
-        this.logEvent(event.getProperties());
+        let reportData = {
+            [TYPES.timing]: event.getProperties()
+        }
+        this.report(reportData)
+        // this.logEvent(event.getProperties());
+
     } else {
         setTimeout(function() {
             that.trackPageLoad()
@@ -719,14 +875,22 @@ UIS.fn.trackError = function() {
                 }
                 var uis = window.uis || new UIS();
                 var event = new UISEvent(uis);
-                event.setEventType("jserror");
-                event.set("error_js", data.url);
-                event.set("error_line", data.line);
-                event.set("error_col", data.col);
-                event.set("error_msg", data.msg.toString());
+                event.setEventType(TYPES.scirptError);
+                event.set("fileName", data.url);
+                event.set("lineNumber", data.line);
+                event.set("columnNumber", data.col);
+                event.set("exception", msg);
+                event.set("stacktrace", data.msg.toString());
                 // data.msg 字段会将 js 出错的完整信息都提交
                 // event.set("error_msg", "JS 逻辑异常");
-                uis.logEvent(event.getProperties());
+                // uis.logEvent(event.getProperties());
+
+                let reportData = {
+                    [TYPES.scirptError]: event.getProperties()
+                }
+                console.log("reportData", reportData)
+                uis.report(reportData)
+
             }, 0)
             //return true;
     };
@@ -748,7 +912,7 @@ UIS.fn.start = function(params) {
     }
     // 会统计所有的点击事件，并触发信息提交
     this.trackClicks();
-    this.trackRouter();
+    // this.trackRouter();
     this.trackPageLoad();
     this.trackError();
 
