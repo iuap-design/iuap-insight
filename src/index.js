@@ -22,6 +22,6 @@ window.monitor = monitor || {}
 uis.monitor = monitor
 uis.rrweb = rrweb
 
-Object.assign(uis, {hook, unHook, proxy, unProxy})
+// Object.assign(uis, {hook, unHook, proxy, unProxy})
 
 export default uis

@@ -1,5 +1,7 @@
 import UISEvent from './UISEvent'
 import timing from './timing/timingjs'
+import { hook, unHook } from "./request-hook/ajax-hook";
+import { proxy, unProxy } from "./request-hook/proxy-hook";
 import * as Utils from './utils'
 
 
@@ -394,9 +396,9 @@ UIS.fn.logEvent = function(properties, block, callback) {
 
     //每次发送请求之前，检查是否有jqueryAjax的track
     if (this.isTrackingJqueryAjax === false){
-      if (window.$ && window.$.ajax){
+      /* if (window.$ && window.$.ajax){
         this.trackJqueryAjax(window.$);
-      }
+      } */
     }
 
     var url = this._parseRequestUrl(properties);
@@ -436,13 +438,13 @@ UIS.fn.report = function (data, block, callback) {
         device: this.getDevice(),
         ...data
     }
-    console.log("reportData", reportData)
+    console.log("reportData-->", reportData)
 
     //每次发送请求之前，检查是否有jqueryAjax的track
     if (this.isTrackingJqueryAjax === false){
-      if (window.$ && window.$.ajax){
+      /* if (window.$ && window.$.ajax){
         this.trackJqueryAjax(window.$);
-      }
+      } */
     }
 
     var url = this._parseRequestUrl(reportData);
@@ -657,6 +659,62 @@ UIS.fn.trackClicks = function( ) {
     // 不定制 click_text 字段
     this.bindClickEvents( false );
 };
+
+/**
+ * 监控 XMLHttpRequest HTTP 请求
+ */
+UIS.fn.trackHttpInfo = function () {
+    let requestData = {}
+    let _self = this;
+
+    proxy({
+        //请求发起前进入
+        onRequest: (config, handler) => {
+            // console.log(config)
+            requestData = config;
+            handler.next(config);
+        },
+        //请求发生错误时进入，比如超时；注意，不包括http状态码错误，如404仍然会认为请求成功
+        onError: (err, handler) => {
+            console.log(err, requestData)
+            _self._handleReport(requestData, undefined, err)
+            handler.next(err)
+
+        },
+        //请求成功后进入
+        onResponse: (response, handler) => {
+            // console.log(response, requestData)
+            _self._handleReport(requestData, response)
+            handler.next(response)
+        }
+    })
+}
+
+UIS.fn._handleReport = function (request = {}, response, err) {
+    var event = new UISEvent(this);
+    let url = request.url
+
+    event.set('http_req_url', url);
+    if (url && url.split("?").length > 1) {
+        event.set('http_req_queryString', url.split("?")[1]);
+    }
+    event.set('http_req_method', request.method);
+    event.set('http_req_body', request.body);
+    if (response) {
+        event.set('http_res_status', response.status);
+        event.set('http_res_statusText', response.statusText);
+        event.set('http_res_body', response.response);
+    }
+
+    if (err) {
+        event.set('http_err', err.error.type);
+    }
+
+    let reportData = {
+        [TYPES.httpInfo]: event.getProperties()
+    }
+    this.report(reportData)
+}
 
 /**
  * 监控jqueryAjax请求
@@ -915,12 +973,13 @@ UIS.fn.start = function(params) {
     // this.trackRouter();
     this.trackPageLoad();
     this.trackError();
+    this.trackHttpInfo()
 
     // 1.只有项目中使用了 jquery 提供的 ajax 方法的时候，才使用 trackJqueryAjax 进行 http 信息统计
     // 2.通用方案待确定
-    if (window.$ && window.$.ajax){
-      this.trackJqueryAjax(window.$);
-    }
+    // if (window.$ && window.$.ajax){
+    //   this.trackJqueryAjax(window.$);
+    // }
 }
 
 export default UIS
