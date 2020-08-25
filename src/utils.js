@@ -582,3 +582,47 @@ export function transToQuery (data) {
     }
     return query;
 }
+
+/**
+ * 数据上报
+ * @param {String}  url 上报地址
+ * @param {Object} reportData 上报数据
+ * @param {Function} successCb 成功回调
+ * @param {Function} errorCb 失败回调
+ * @returns {*}
+ */
+export function post (url, reportData, successCb, errorCb) {
+    var xmlreq;
+    if (window.XMLHttpRequest) { //非IE
+        let XMLHttpRequestConstructor = window._rxhr || XMLHttpRequest
+        xmlreq = new XMLHttpRequestConstructor();
+
+    } else if (window.ActiveXObject) { //IE
+        try {
+            xmlreq = new ActiveXObject("Msxml2.HTTP");
+        } catch (e) {
+            try {
+                xmlreq = new ActiveXObject("microsoft.HTTP");
+            } catch (e) {
+            }
+        }
+    }
+
+    xmlreq.onreadystatechange = function (data) {
+        if (xmlreq.readyState == 4) {
+            if (xmlreq.status == 200) {
+                typeof successCb == "function" && successCb(xmlreq.responseText);
+            } else {
+                typeof errorCb == "function" && errorCb();
+            }
+        }
+    }
+    try {
+        xmlreq.open('POST', url);
+        xmlreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  //设置请求头
+        xmlreq.send(JSON.stringify(reportData));
+    } catch (e) {
+        typeof errorCb == "function" && errorCb(e);
+    }
+
+}

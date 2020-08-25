@@ -439,6 +439,9 @@ UIS.fn.report = function (data, block, callback) {
         ...data
     }
     console.log("reportData-->", reportData)
+    
+    Utils.post(this.getOption("trackerUrl"), reportData)
+    return
 
     //每次发送请求之前，检查是否有jqueryAjax的track
     if (this.isTrackingJqueryAjax === false){
@@ -946,7 +949,6 @@ UIS.fn.trackError = function() {
                 let reportData = {
                     [TYPES.scirptError]: event.getProperties()
                 }
-                console.log("reportData", reportData)
                 uis.report(reportData)
 
             }, 0)
