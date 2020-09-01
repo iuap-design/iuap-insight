@@ -683,7 +683,7 @@ UIS.fn.trackHttpInfo = function () {
     proxy({
         //请求发起前进入
         onRequest: (config, handler) => {
-            // console.log(config)
+            config.startTime = Date.now()
             requestData = config;
             handler.next(config);
         },
@@ -696,7 +696,7 @@ UIS.fn.trackHttpInfo = function () {
         },
         //请求成功后进入
         onResponse: (response, handler) => {
-            // console.log(response, requestData)
+            console.log(response, requestData)
             _self._handleReport(requestData, response)
             handler.next(response)
         }
@@ -711,6 +711,7 @@ UIS.fn._handleReport = function (request = {}, response, err) {
     if (url && url.split("?").length > 1) {
         event.set('httpReqQueryString', url.split("?")[1]);
     }
+    event.set('domainKey',request.headers && request.headers["domain-key"] ? request.headers["domain-key"] : "");
     event.set('httpReqMethod', request.method);
     event.set('httpReqBody', request.body);
     if (response) {
@@ -722,6 +723,8 @@ UIS.fn._handleReport = function (request = {}, response, err) {
     if (err) {
         event.set('httpErr', err.error.type);
     }
+
+    event.set('httpCost', Date.now() - request.startTime);
 
     let reportData = {
         [TYPES.httpInfo]: event.getProperties()
