@@ -474,10 +474,11 @@ UIS.fn.report = function (data, block, callback) {
  */
 UIS.fn.getGeneralInfo = function () {
     let general = {
+        host: window.location.host,
         // 全链路追踪的唯一id
-        traceid: "",
+        traceId: "",
         // 全链路追踪的name
-        trace_name: "",
+        traceName: "",
         // 录制的唯一id ,从cookie里取值
         uid: Utils.getCookie("mdd_monitor_uid"),
         spanId: "",
@@ -493,15 +494,15 @@ UIS.fn.getGeneralInfo = function () {
         // span名称 查询 新增
         name: "",
         // 函数名
-        remote_method: "",
+        remoteMethod: "",
 
         // 应用appid
-        site_id: "",
-        page_title: "",
+        siteId: "",
+        pageTitle: "",
         // 节点URL
         url: "",
         // 节点父级URL
-        url_ref: "",
+        urlRef: this.getUrlRef(),
         // 节点编码
         serviceCode: "",
         // 节点名称
@@ -510,6 +511,15 @@ UIS.fn.getGeneralInfo = function () {
 
     return general;
 };
+
+/**
+ * 获取节点父级URL
+ */
+UIS.fn.getUrlRef = function () {
+    var locationArray = this.urlFixup(document.domain, window.location.href, this.getReferrer());
+    var configReferrerUrl = decodeURIComponent(locationArray[2]);
+    return configReferrerUrl || ""
+}
 
 /**
  * 获取设备信息
@@ -543,16 +553,16 @@ UIS.fn.getDevice = function () {
     // device.set('ip', "");
 
     // 设备类型
-    device.set('logtype', "client");
+    device.set('logType', "client");
 
     // 分辨率
     device.set('res', `${window.screen.width}x${window.screen.height}`);
 
     // 当前屏幕宽度
-    device.set('res_x', window.screen.width);
+    device.set('resX', window.screen.width);
 
     // 当前屏幕高度
-    device.set('res_y', window.screen.height);
+    device.set('resY', window.screen.height);
 
     return device.getProperties()
 };
@@ -594,32 +604,32 @@ UIS.fn.clickEventHandler = function(e, isComstomClickText) {
     console.log('isComstomClickText:' + isComstomClickText)
     // 设置点击时候的信息
     if ( isComstomClickText ) {
-      var click_text_value = uis.getOption('click_text')
-      click.set('click_text', click_text_value);
+      var click_text_value = uis.getOption('clickText')
+      click.set('clickText', click_text_value);
     } else {
-      click.set('click_text', targ.innerText);
+      click.set('clickText', targ.innerText);
     }
 
     if (targ.attributes && targ.attributes.hasOwnProperty('name') && targ.attributes.name.value && targ.attributes.name.value.length > 0) {
-        click.set('click_name', targ.attributes.name.value);
+        click.set('clickName', targ.attributes.name.value);
     }
 
     if (targ.value && targ.value.length > 0) {
-        click.set('click_value', targ.value);
+        click.set('clickValue', targ.value);
     }
 
     if (targ.id && targ.id.length > 0) {
-        click.set('click_id', targ.id);
+        click.set('clickId', targ.id);
     }
 
     if (targ.className && targ.className.length > 0) {
-        click.set('click_class', targ.className);
+        click.set('clickClass', targ.className);
     }
 
-    click.set("click_tag", Utils.strtolower(targ.tagName));
+    click.set("clickTag", Utils.strtolower(targ.tagName));
 
-    click.set('click_pos_x', this.findPosX(targ));
-    click.set('click_pos_y', this.findPosY(targ));
+    click.set('clickPosX', this.findPosX(targ));
+    click.set('clickPosY', this.findPosY(targ));
 
  
     let reportData = {
@@ -697,20 +707,20 @@ UIS.fn._handleReport = function (request = {}, response, err) {
     var event = new UISEvent(this);
     let url = request.url
 
-    event.set('http_req_url', url);
+    event.set('httpReqUrl', url);
     if (url && url.split("?").length > 1) {
-        event.set('http_req_queryString', url.split("?")[1]);
+        event.set('httpReqQueryString', url.split("?")[1]);
     }
-    event.set('http_req_method', request.method);
-    event.set('http_req_body', request.body);
+    event.set('httpReqMethod', request.method);
+    event.set('httpReqBody', request.body);
     if (response) {
-        event.set('http_res_status', response.status);
-        event.set('http_res_statusText', response.statusText);
-        event.set('http_res_body', response.response);
+        event.set('httpResStatus', response.status);
+        event.set('httpResStatusText', response.statusText);
+        event.set('httpResBody', response.response);
     }
 
     if (err) {
-        event.set('http_err', err.error.type);
+        event.set('httpErr', err.error.type);
     }
 
     let reportData = {
@@ -864,24 +874,25 @@ UIS.fn.trackPageLoad = function() {
     var event = new UISEvent(this);
     var myTime = timing.getTimes();
     if (myTime.loadTime > 0) {
+        debugger
         //var load_tm = myTime.loadTime;
         var action_id = event.generateRandomUuid();
         event.setEventType("page_load");
         event.setAction(action_id);
-        event.set('t_unload', myTime.t_unload || 0);
-        event.set('t_redirect', myTime.t_redirect || 0);
-        event.set('t_dns', myTime.t_dns || 0);
-        event.set('t_tcp', myTime.t_tcp || 0);
-        event.set('t_request', myTime.t_request || 0);
-        event.set('t_response', myTime.t_response || 0);
-        event.set('t_paint', myTime.t_paint || 0);
-        event.set('t_dom', myTime.t_dom || 0);
-        event.set('t_domready', myTime.t_domready || 0);
-        event.set('t_load', myTime.t_load || 0);
-        event.set('t_onload', myTime.t_onload || 0);
-        event.set('t_white', myTime.t_white || 0);
-        event.set('t_all', myTime.t_all || 0);
-        event.set('ajax_tm', myTime.t_all || 0);
+        event.set('tUnload', myTime.t_unload || 0);
+        event.set('tRedirect', myTime.t_redirect || 0);
+        event.set('tDns', myTime.t_dns || 0);
+        event.set('tTcp', myTime.t_tcp || 0);
+        event.set('tRequest', myTime.t_request || 0);
+        event.set('tResponse', myTime.t_response || 0);
+        event.set('tPaint', myTime.t_paint || 0);
+        event.set('tDom', myTime.t_dom || 0);
+        event.set('tDomready', myTime.t_domready || 0);
+        event.set('tLoad', myTime.t_load || 0);
+        event.set('tOnload', myTime.t_onload || 0);
+        event.set('tWhite', myTime.t_white || 0);
+        event.set('tAll', myTime.t_all || 0);
+        event.set('ajaxTm', myTime.t_all || 0);
         let reportData = {
             [TYPES.timing]: event.getProperties()
         }

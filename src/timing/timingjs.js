@@ -81,6 +81,23 @@ const timing =  {
             api.initDomTreeTime = timing.domInteractive - timing.responseEnd;
             // Load event time
             api.loadEventTime = timing.loadEventEnd - timing.loadEventStart;
+
+            let start = timing.navigationStart || timing.fetchStart;
+            api.t_unload = api.unloadEventTime,
+            api.t_redirect = api.redirectTime,
+            api.t_dns = api.lookupDomainTime,
+            api.t_tcp = api.connectTime,
+            api.t_request = timing.responseStart - timing.requestStart,
+            api.t_response = timing.responseEnd - timing.responseStart,
+            api.t_paint = parseInt(api.firstPaintTime) - parseInt(start),
+            api.t_paint = api.t_paint < 0 ? 0 : api.t_paint,
+            api.t_dom = timing.domContentLoadedEventStart - timing.domLoading,
+            api.t_domready = timing.domContentLoadedEventStart - start,
+            api.t_load = timing.loadEventStart - timing.domLoading,
+            api.t_onload = timing.loadEventStart - start,
+            api.t_white = timing.responseStart - start,
+            api.t_all = timing.loadEventEnd - start
+
         }
 
         return api;
