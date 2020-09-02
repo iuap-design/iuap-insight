@@ -486,7 +486,7 @@ UIS.fn.getGeneralInfo = function () {
         // 打印信息
         msg: "",
         // 当前时间
-        ts: "",
+        clientTs: Date.now(),
         // Cookie yonyou_uid
         userId: Utils.getCookie("yonyou_uid"),
         // Cookie tenantid
@@ -498,9 +498,9 @@ UIS.fn.getGeneralInfo = function () {
 
         // 应用appid
         siteId: "",
-        pageTitle: "",
+        pageTitle: window.document.title,
         // 节点URL
-        url: "",
+        url: window.location.href,
         // 节点父级URL
         urlRef: this.getUrlRef(),
         // 节点编码
