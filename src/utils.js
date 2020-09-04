@@ -584,6 +584,21 @@ export function transToQuery (data) {
 }
 
 /**
+ * 获取请求URL的host
+ * @param url
+ */
+export function getUrlHost (url) {
+    let host = window.location.host;
+    try {
+        let urlIns = new URL(url)
+        host = urlIns.host
+    } catch (error) {
+
+    }
+    return host
+}
+
+/**
  * 数据上报
  * @param {String}  url 上报地址
  * @param {Object} reportData 上报数据

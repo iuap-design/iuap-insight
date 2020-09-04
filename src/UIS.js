@@ -712,6 +712,7 @@ UIS.fn._handleReport = function (request = {}, response, err) {
         event.set('httpReqQueryString', url.split("?")[1]);
     }
     event.set('domainKey',request.headers && request.headers["domain-key"] ? request.headers["domain-key"] : "");
+    event.set('host', Utils.getUrlHost(url));
     event.set('httpReqMethod', request.method);
     event.set('httpReqBody', request.body);
     if (response) {
