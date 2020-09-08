@@ -3,7 +3,7 @@
  * Hubble 录制类
  */
 class Hubble {
-  constructor() {
+  constructor({ isRecordScreen = true } = {}) {
 
     // Hubble录制的config
     this.config = {
@@ -22,8 +22,8 @@ class Hubble {
 
     // 录屏的config
     this.screenConfig = {
-      // 录制结束
-      isEnd: false,
+      // 是否开启屏幕录制
+      isEnable: !!isRecordScreen,
       // 倒计时timer
       timer: null,
       // 分段上报录屏信息的timer
@@ -40,9 +40,12 @@ class Hubble {
     };
 
 
-    setTimeout(() => {
-      this._initScreenScr()
-    }, 2000);
+    if (isRecordScreen) {
+      setTimeout(() => {
+        this._initScreenScr()
+      }, 2000);
+    }
+
   }
 
   _setConfig (key, value) {
@@ -185,19 +188,15 @@ class Hubble {
    * 开始录屏
    */
   _startRecordScreen () {
-    debugger
     if (!rrwebRecord) return
     let _self = this;
 
-    debugger
     this._screenStopFn = rrwebRecord({
       emit (event) {
         let curCount = _self._getScreenConfig('count')
-        debugger
         _self._setScreenConfig('count', curCount + 1)
 
         _self.screenConfig.events.push(event)
-        console.log("event", event)
       },
     });
 
@@ -237,7 +236,6 @@ class Hubble {
     let uploadUrl = this._getScreenConfig("screenUrl")
     let curCount = this._getScreenConfig('count')
     let curEvents = this._getScreenConfig('events')
-    debugger
 
     var startIndex = curCount - (curEvents.length || 1)
     var endIndex = curCount - 1
@@ -295,14 +293,15 @@ class Hubble {
   /**
   * 开始录制
   */
-  startRecordHubble () {
-    debugger
+  startRecord () {
     this._setConfig("isEnd", false)
     this._setCookie("mdd_monitor_uid", this._generateUID(), this._getMainHost())
     this._setCookie("mdd_monitor_record", "true", this._getMainHost())
     this._toggleRecord()
 
-    this._startRecordScreen()
+    if (this._getScreenConfig("isRecordScreen")) {
+      this._startRecordScreen()
+    }
     this.config.timer = setTimeout(() => {
       this._stopByTimer()
     }, 1000 * 60 * 5);
@@ -311,7 +310,7 @@ class Hubble {
   /**
    * 结束录制
    */
-  stopRecordHubble () {
+  stopRecord () {
     let reportUrl = `${this.config.reportUrl}?uid=${this._getCookie("mdd_monitor_uid")}`;
     if (this.config.timer) {
       clearTimeout(this.config.timer)
@@ -321,7 +320,9 @@ class Hubble {
       this._toggleRecord()
     }
 
-    this._stopRecordScreen()
+    if (this._getScreenConfig("isRecordScreen")) {
+      this._stopRecordScreen()
+    }
 
     window.open(reportUrl)
     this._setCookie("mdd_monitor_uid", "", this._getMainHost())
@@ -333,8 +334,8 @@ class Hubble {
   /**
    * 录制是否开始了
    */
-  isHubbleRecordStarted () {
-    return _getCookie("mdd_monitor_record") === "true"
+  isRecording () {
+    return this._getCookie("mdd_monitor_record") === "true"
   }
 
 
