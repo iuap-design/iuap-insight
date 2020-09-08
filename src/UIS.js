@@ -707,7 +707,7 @@ UIS.fn._handleReport = function (request = {}, response, err) {
     var event = new UISEvent(this);
     let url = request.url
 
-    event.set('httpReqUrl', url);
+    event.set('httpReqUrl', Utils.handleUrlWithOrigin(url));
     if (url && url.split("?").length > 1) {
         event.set('httpReqQueryString', url.split("?")[1]);
     }

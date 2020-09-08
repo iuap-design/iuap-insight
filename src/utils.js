@@ -599,6 +599,17 @@ export function getUrlHost (url) {
 }
 
 /**
+ * 获取请求URL的host
+ * @param url
+ */
+export function handleUrlWithOrigin (url = '') {
+    if (!url.startsWith("http")) {
+        return `${window.location.origin}${url}`
+    }
+    return url
+}
+
+/**
  * 数据上报
  * @param {String}  url 上报地址
  * @param {Object} reportData 上报数据
