@@ -6,6 +6,7 @@
  */
 
 import UIS from './UIS.js'
+import Hubble from "./hubble/index.js"
 import TraceMonitor from './monitor/traceMonitor.js'
 import * as rrwebAPI from './rrweb'
 
@@ -14,8 +15,10 @@ import {proxy, unProxy} from "./request-hook/proxy-hook";
 
 const monitor = TraceMonitor.getInstance()
 const uis = new UIS();
+const hubble = new Hubble()
 
 window.uis = uis || {}
+window.hubble = hubble
 window.rrweb = rrwebAPI || {}
 window.monitor = monitor || {}
 
