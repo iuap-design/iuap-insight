@@ -3,7 +3,7 @@
  * Hubble 录制类
  */
 class Hubble {
-  constructor({ isRecordScreen = true } = {}) {
+  constructor() {
 
     // Hubble录制的config
     this.config = {
@@ -23,7 +23,7 @@ class Hubble {
     // 录屏的config
     this.screenConfig = {
       // 是否开启屏幕录制
-      isEnable: !!isRecordScreen,
+      isEnable: true,
       // 倒计时timer
       timer: null,
       // 分段上报录屏信息的timer
@@ -40,11 +40,9 @@ class Hubble {
     };
 
 
-    if (isRecordScreen) {
-      setTimeout(() => {
-        this._initScreenScr()
-      }, 2000);
-    }
+    setTimeout(() => {
+      this._initScreenScr()
+    }, 2000);
 
   }
 
@@ -293,13 +291,15 @@ class Hubble {
   /**
   * 开始录制
   */
-  startRecord () {
+  startRecord ({ isEnableScreen = true } = {}) {
     this._setConfig("isEnd", false)
     this._setCookie("mdd_monitor_uid", this._generateUID(), this._getMainHost())
     this._setCookie("mdd_monitor_record", "true", this._getMainHost())
     this._toggleRecord()
 
-    if (this._getScreenConfig("isRecordScreen")) {
+    this._setScreenConfig("isEnable", !!isEnableScreen)
+    if (!!isEnableScreen) {
+      console.log("enable screen")
       this._startRecordScreen()
     }
     this.config.timer = setTimeout(() => {
@@ -320,7 +320,7 @@ class Hubble {
       this._toggleRecord()
     }
 
-    if (this._getScreenConfig("isRecordScreen")) {
+    if (this._getScreenConfig("isEnable")) {
       this._stopRecordScreen()
     }
 
