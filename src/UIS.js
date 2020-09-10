@@ -438,7 +438,6 @@ UIS.fn.report = function (data, block, callback) {
         device: this.getDevice(),
         ...data
     }
-    console.log("reportData-->", reportData)
     
     Utils.post(this.getOption("trackerUrl"), reportData)
     return
@@ -601,7 +600,6 @@ UIS.fn.clickEventHandler = function(e, isComstomClickText) {
     if (targ.hasOwnProperty && targ.hasOwnProperty('value') && targ.value.length > 0) {
         dom_value = targ.value;
     }
-    console.log('isComstomClickText:' + isComstomClickText)
     // 设置点击时候的信息
     if ( isComstomClickText ) {
       var click_text_value = uis.getOption('clickText')
@@ -689,14 +687,12 @@ UIS.fn.trackHttpInfo = function () {
         },
         //请求发生错误时进入，比如超时；注意，不包括http状态码错误，如404仍然会认为请求成功
         onError: (err, handler) => {
-            console.log(err, requestData)
             _self._handleReport(requestData, undefined, err)
             handler.next(err)
 
         },
         //请求成功后进入
         onResponse: (response, handler) => {
-            console.log(response, requestData)
             _self._handleReport(requestData, response)
             handler.next(response)
         }
@@ -878,7 +874,6 @@ UIS.fn.trackPageLoad = function() {
     var event = new UISEvent(this);
     var myTime = timing.getTimes();
     if (myTime.loadTime > 0) {
-        debugger
         //var load_tm = myTime.loadTime;
         var action_id = event.generateRandomUuid();
         event.setEventType("page_load");
@@ -933,9 +928,10 @@ UIS.fn.trackError = function() {
                 data.url = url;
                 data.line = line;
                 data.col = col;
+                data.msg = "";
                 if (!!error && !!error.stack) {
                     data.msg = error.stack.toString();
-                } else if (!!arguments.callee) {
+                } /* else if (!!arguments.callee) {
                     var ext = [];
                     var f = arguments.callee.caller,
                         c = 3;
@@ -948,7 +944,7 @@ UIS.fn.trackError = function() {
                     }
                     ext = ext.join(",");
                     data.msg = ext;
-                }
+                } */
                 var uis = window.uis || new UIS();
                 var event = new UISEvent(uis);
                 event.setEventType(TYPES.scirptError);
