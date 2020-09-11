@@ -442,6 +442,10 @@ UIS.fn.report = function (data, block, callback) {
     // Utils.post(this.getOption("trackerUrl"), reportData)
     if (navigator.sendBeacon) {
         navigator.sendBeacon(this.getOption("trackerUrl"), JSON.stringify(reportData))
+    } else {
+        let image = new Image(1, 1);
+        let imgUrl = `${this.getOption("trackerUrl")}?data=${encodeURIComponent(JSON.stringify(reportData))}`
+        image.src = imgUrl;
     }
     return
 
@@ -717,7 +721,7 @@ UIS.fn._handleReport = function (request = {}, response, err) {
     if (response) {
         event.set('httpResStatus', response.status);
         event.set('httpResStatusText', response.statusText);
-        event.set('httpResBody', response.response);
+        // event.set('httpResBody', response.response);
     }
 
     if (err) {
