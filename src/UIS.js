@@ -439,7 +439,10 @@ UIS.fn.report = function (data, block, callback) {
         ...data
     }
     
-    Utils.post(this.getOption("trackerUrl"), reportData)
+    // Utils.post(this.getOption("trackerUrl"), reportData)
+    if (navigator.sendBeacon) {
+        navigator.sendBeacon(this.getOption("trackerUrl"), JSON.stringify(reportData))
+    }
     return
 
     //每次发送请求之前，检查是否有jqueryAjax的track
