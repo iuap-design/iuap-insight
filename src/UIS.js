@@ -18,6 +18,9 @@ const TYPES = {
     record: "record",
 };
 
+const FourK = 4 * 1024;
+const TwleveK = 12 * 1024;
+
 /**
  * UIS 基类对象
  * API：trackEvent、treackError、start等
@@ -722,7 +725,12 @@ UIS.fn._handleReport = function (request = {}, response, err) {
     if (response) {
         event.set('httpResStatus', response.status);
         event.set('httpResStatusText', response.statusText);
-        // event.set('httpResBody', response.response);
+        let resSize = this._getResponseSize(JSON.stringify(response.response))
+
+        if (resSize && resSize <= FourK) {
+            event.set('httpResSize', resSize);
+            event.set('httpResBody', response.response);
+        }
     }
 
     if (err) {
@@ -735,6 +743,20 @@ UIS.fn._handleReport = function (request = {}, response, err) {
         [TYPES.httpInfo]: event.getProperties()
     }
     this.report(reportData)
+}
+
+/**
+ * 获取response的字节数
+ * @param str
+ */
+UIS.fn._getResponseSize = function (str) {
+    let size = null
+    const twleveK = TwleveK;
+    if (str.length > twleveK) {
+        return size
+    }
+
+    return Utils.getStrSize(str)
 }
 
 /**

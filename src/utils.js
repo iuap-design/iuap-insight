@@ -610,6 +610,28 @@ export function handleUrlWithOrigin (url = '') {
 }
 
 /**
+ * 获取字符串的字节数 (UTF8)
+ * @param str {String}
+ */
+export function getStrSize (str = "") {
+    let total = 0;
+
+    for (let i = 0, len = str.length; i < len; i++) {
+        let charCode = str.charCodeAt(i);
+        if (charCode <= 0x007f) {
+            total += 1;
+        } else if (charCode <= 0x07ff) {
+            total += 2;
+        } else if (charCode <= 0xffff) {
+            total += 3;
+        } else {
+            total += 4;
+        }
+    }
+    return total;
+}
+
+/**
  * 数据上报
  * @param {String}  url 上报地址
  * @param {Object} reportData 上报数据
