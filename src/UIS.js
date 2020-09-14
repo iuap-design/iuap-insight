@@ -30,6 +30,7 @@ function UIS(){
         configCookieNamePrefix: '_pk_',
         siteId: '',
         userId: '',
+        isTrackClick: false,
         visitorId: ''
     };
     this.isClickTrackingEnabled = false;
@@ -988,8 +989,14 @@ UIS.fn.start = function(params) {
     if (params['siteId']){
       this.setOption("siteId", params['siteId']);
     }
+    if (params['isTrackClick']) {
+        this.setOption("isTrackClick", params['isTrackClick']);
+    }
+
     // 会统计所有的点击事件，并触发信息提交
-    this.trackClicks();
+    if (this.getOption("isTrackClick")) {
+        this.trackClicks();
+    }
     // this.trackRouter();
     this.trackPageLoad();
     this.trackError();
