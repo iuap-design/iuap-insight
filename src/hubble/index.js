@@ -40,9 +40,11 @@ class Hubble {
     };
 
 
+    /*
     setTimeout(() => {
       this._initScreenScr()
     }, 2000);
+    */
 
   }
 
@@ -286,6 +288,16 @@ class Hubble {
       typeof errorCb == "function" && errorCb(e);
     }
 
+  }
+
+  /**
+   * 私有化时的初始化
+   */
+  privateInit ({ domain = "" }) {
+    if (domain) {
+      this._setConfig("url", `${domain}/hubble/monitor/record`)
+      this._setConfig("reportUrl", `${domain}/fe/hubble-new/index.html#/hubble-report`)
+    }
   }
 
   /**
