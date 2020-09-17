@@ -129,6 +129,7 @@ class Hubble {
    * 获取主域名
    */
   _getMainHost () {
+    return document.domain
     let key = `mh_${Math.random()}`;
     let keyR = new RegExp(`(^|;)\\s*${key}=12345`);
     let expiredTime = new Date(0);
@@ -188,7 +189,7 @@ class Hubble {
    * 开始录屏
    */
   _startRecordScreen () {
-    if (!rrwebRecord) return
+    if (typeof rrwebRecord === "undefined") return
     let _self = this;
 
     this._screenStopFn = rrwebRecord({
