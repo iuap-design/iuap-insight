@@ -975,6 +975,22 @@ UIS.fn.trackError = function() {
 }
 
 /**
+ * @description 页面开始加载
+ * @param {*} data
+ */
+UIS.fn.pageStart = function (data) {
+    console.log("pageStart", data)
+}
+
+/**
+ * @description 页面结束加载
+ * @param {*} data
+ */
+UIS.fn.pageEnd = function (data) {
+    console.log("pageEnd", data)
+}
+
+/**
  * SDK 初始化
  * @param {*} params 
  */

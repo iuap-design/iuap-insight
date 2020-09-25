@@ -89,7 +89,26 @@ class Hubble {
    * 开始录制 结束录制各调用一次
    */
   _toggleRecord () {
-    const recordUrl = `${this.config.url}?uid=${this._getCookie("mdd_monitor_uid")}`;
+
+    let uid = this._getCookie("mdd_monitor_uid")
+    if (jDiwork && jDiwork.getContext && typeof jDiwork.getContext === "function") {
+      jDiwork.getContext((data) => {
+        let userId = data && data.userid ? data.userid : null
+        this._callRecord(uid, userId)
+      })
+    } else {
+      this._callRecord(uid)
+    }
+  }
+
+  /**
+   * 发起jsonp调用
+   */
+  _callRecord (uid = this._getCookie("mdd_monitor_uid"), userId) {
+    let recordUrl = `${this.config.url}?uid=${uid}`;
+    if (userId) {
+      recordUrl += `&userId=${userId}`
+    }
     const startId = "hubble_record_script"
 
     let $startScript = document.getElementById(startId)

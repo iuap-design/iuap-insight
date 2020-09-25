@@ -17,8 +17,8 @@ const monitor = TraceMonitor.getInstance()
 const uis = new UIS();
 const hubble = new Hubble()
 
-window.uis = uis || {}
-// window.uis = { start: () => { } }
+// window.uis = uis || {}
+window.uis = { start: () => { } }
 window.hubble = hubble
 window.rrweb = rrwebAPI || {}
 window.monitor = monitor || {}
