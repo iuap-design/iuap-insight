@@ -14,7 +14,7 @@ import {hook, unHook} from "./request-hook/ajax-hook";
 import {proxy, unProxy} from "./request-hook/proxy-hook";
 
 const monitor = TraceMonitor.getInstance()
-const uis = new UIS();
+// const uis = new UIS();
 const hubble = new Hubble()
 
 // window.uis = uis || {}
@@ -24,7 +24,7 @@ window.rrweb = rrwebAPI || {}
 window.monitor = monitor || {}
 
 uis.monitor = monitor
-uis.rrweb = rrweb
+// uis.rrweb = rrweb
 
 // Object.assign(uis, {hook, unHook, proxy, unProxy})
 

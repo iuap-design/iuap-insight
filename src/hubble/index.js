@@ -91,8 +91,10 @@ class Hubble {
   _toggleRecord () {
 
     let uid = this._getCookie("mdd_monitor_uid")
-    if (jDiwork && jDiwork.getContext && typeof jDiwork.getContext === "function") {
-      jDiwork.getContext((data) => {
+    if (Object.prototype.toString.call(window.jDiwork) === "[object Object]"
+      && window.jDiwork.getContext
+      && typeof window.jDiwork.getContext === "function") {
+      window.jDiwork.getContext((data) => {
         let userId = data && data.userid ? data.userid : null
         this._callRecord(uid, userId)
       })
@@ -155,10 +157,11 @@ class Hubble {
     let urlItems = [];
     // 主域名一定会有两部分组成
     urlItems.unshift(domainList.pop());
+    let mainHost = null;
     // 慢慢从后往前测试
     while (domainList.length) {
       urlItems.unshift(domainList.pop());
-      let mainHost = urlItems.join('.');
+      mainHost = urlItems.join('.');
       let cookie = `${key}=${12345};domain=.${mainHost}`;
 
       document.cookie = cookie;
@@ -169,6 +172,7 @@ class Hubble {
         return mainHost;
       }
     }
+    return mainHost || document.domain
   }
 
 
