@@ -362,6 +362,14 @@ class Hubble {
   }
 
 
+      /**
+   * 查询开始时间和结束时间
+   */
+  _getTimeRange (item) {
+    console.log("单点性能测试",item)
+  }
+
+
 
 }
 
