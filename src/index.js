@@ -24,6 +24,22 @@ window.rrweb = rrwebAPI || {}
 window.monitor = monitor || {}
 
 uis.monitor = monitor
+hubble.getTimeRange([
+    {
+    uid: "sunwj-client-perform-2",
+    domainCode: "test-domain-code-2",
+    domainName: "测试领域-2",
+    productCode: "test-product-code-2",
+    productName: "产品名称-2",
+    functionNum: "page-num-2",
+    functionName: "page-name-2",
+    functionPoint: "功能点2",
+    httpRequestCount: 20,
+    downBoundBytes: 238,
+    duration: 30,
+    isFirstOpen: false
+    }
+    ])
 // uis.rrweb = rrweb
 
 // Object.assign(uis, {hook, unHook, proxy, unProxy})

@@ -2,6 +2,7 @@
 /**
  * Hubble 录制类
  */
+import {post} from '../utils'
 class Hubble {
   constructor() {
 
@@ -371,6 +372,7 @@ class Hubble {
    */
   getTimeRange (item) {
     console.log("单点性能测试",item)
+    post(`${this.config.url}/hubble/client-perform`,item,()=>{console.log("sucess")})
   }
 
 
