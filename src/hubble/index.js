@@ -107,7 +107,11 @@ class Hubble {
    * 发起jsonp调用
    */
   _callRecord (uid = this._getCookie("mdd_monitor_uid"), userId) {
-    let recordUrl = `${this.config.url}?uid=${uid}`;
+    let isDiwork = Object.prototype.toString.call(window.jDiwork) === "[object Object]"
+    && window.jDiwork.getContext
+    && typeof window.jDiwork.getContext === "function";
+
+    let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.origin}`;
     if (userId) {
       recordUrl += `&userId=${userId}`
     }
@@ -365,7 +369,7 @@ class Hubble {
       /**
    * 查询开始时间和结束时间
    */
-  _getTimeRange (item) {
+  getTimeRange (item) {
     console.log("单点性能测试",item)
   }
 
