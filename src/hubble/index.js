@@ -16,6 +16,9 @@ class Hubble {
       // 录制上报url
       url: "https://developer.yonyoucloud.com/hubble/monitor/record",
 
+      //单点性能测试数据上报
+      singlePointUrl:"https://developer.yonyoucloud.com/hubble/client-perform",
+
       // 中间报告url
       reportUrl: `https://developer.yonyoucloud.com/fe/hubble-new/index.html#/hubble-report`,
 
@@ -371,8 +374,8 @@ class Hubble {
    * 查询开始时间和结束时间
    */
   getTimeRange (item) {
-    console.log("单点性能测试",item)
-    post(`${this.config.url}/hubble/client-perform`,item,()=>{console.log("sucess")})
+    console.log("单点性能测试开始",item)
+    post(`${this.config.singlePointUrl}`,item,()=>{console.log("上报成功")})
   }
 
 
