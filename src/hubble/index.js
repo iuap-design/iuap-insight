@@ -374,6 +374,7 @@ class Hubble {
    * 查询开始时间和结束时间
    */
   getTimeRange (item) {
+    
     console.log("单点性能测试开始",item)
     post(`${this.config.singlePointUrl}`,item,()=>{console.log("上报成功")})
   }
