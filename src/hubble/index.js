@@ -48,6 +48,8 @@ class Hubble {
       this._initScreenScr()
     }, 2000);
 
+    this._initCommunicate()
+
   }
 
   _setConfig (key, value) {
@@ -149,7 +151,7 @@ class Hubble {
     var Days = 30;
     var exp = new Date();
     exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 30);
-    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + domain;
+    document.cookie = name + "=" + escape(value) + ";path=/;expires=" + exp.toGMTString() + ";domain=" + domain;
   }
 
   /**
@@ -319,10 +321,89 @@ class Hubble {
 
   }
 
+
+  /**
+   * 当前active的tab是iframe时候，返回当前iframe的索引
+   */
+  _getActiveIframe () {
+    let allTabIframe = document.querySelectorAll("iframe");
+    this.recordIframe = null
+
+    for (let i = 0; i < allTabIframe.length; i++) {
+      let curIframe = allTabIframe[i]
+      let ifrWrap = curIframe.parentNode.parentNode
+
+      if (typeof ifrWrap.className === "string" &&
+        ifrWrap.className.includes("diwork--") &&
+        ifrWrap.style.visibility === "visible"
+      ) {
+        this.recordIframe = {
+          index: i,
+          id: curIframe.id,
+          src: curIframe.src
+        }
+      }
+    }
+  }
+
+  _getUrlHost (url = "") {
+    let host = ""
+    try {
+      var urlObj = new URL(url)
+      host = urlObj.origin
+    } catch (error) {
+
+    }
+    return host
+  }
+
+  /**
+   * 初始化通信
+  */
+  _initCommunicate () {
+    window.addEventListener('message', (e) => {
+      if (e.data) {
+        try {
+          let data = JSON.parse(e.data)
+          if (data.type === "start") {
+            this.startRecord()
+
+          } else if (data.type === "stop") {
+            this.stopRecord()
+          }
+        } catch (e) {
+        }
+      }
+    }, false);
+  }
+
+  /**
+   * 发送信息到iframe,使用iframe的录制
+   */
+  _sendToIframe (para = {}) {
+    let {
+      type
+    } = para;
+
+    let activeIframe = document.getElementById(this.recordIframe.id).contentWindow
+
+    let sendData = {
+      type,
+      payload: this.recordIframe
+    }
+    activeIframe.postMessage(JSON.stringify(sendData), this._getUrlHost(this.recordIframe.src))
+  }
+
   /**
   * 开始录制
   */
   startRecord ({ isEnableScreen = true } = {}) {
+    // 当前 acitve 的 tab 是否是iframe
+    this._getActiveIframe()
+    if (this.recordIframe) {
+      this._sendToIframe({ type: "start" })
+      return
+    }
     this._setConfig("isEnd", false)
     this._setCookie("mdd_monitor_uid", this._generateUID(), this._getMainHost())
     this._setCookie("mdd_monitor_record", "true", this._getMainHost())
@@ -342,6 +423,12 @@ class Hubble {
    * 结束录制
    */
   stopRecord (obj) {
+    if (this.recordIframe) {
+      this._sendToIframe({ type: "stop" })
+      this.recordIframe = null
+      return
+    }
+
     let reportUrl = `${this.config.reportUrl}?uid=${this._getCookie("mdd_monitor_uid")}`;
     if (this.config.timer) {
       clearTimeout(this.config.timer)
