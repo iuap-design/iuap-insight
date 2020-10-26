@@ -399,11 +399,11 @@ class Hubble {
   */
   startRecord ({ isEnableScreen = true } = {}) {
     // 当前 acitve 的 tab 是否是iframe
-    this._getActiveIframe()
+    /* this._getActiveIframe()
     if (this.recordIframe) {
       this._sendToIframe({ type: "start" })
       return
-    }
+    } */
     this._setConfig("isEnd", false)
     this._setCookie("mdd_monitor_uid", this._generateUID(), this._getMainHost())
     this._setCookie("mdd_monitor_record", "true", this._getMainHost())
@@ -423,11 +423,11 @@ class Hubble {
    * 结束录制
    */
   stopRecord (obj) {
-    if (this.recordIframe) {
+    /* if (this.recordIframe) {
       this._sendToIframe({ type: "stop" })
       this.recordIframe = null
       return
-    }
+    } */
 
     let reportUrl = `${this.config.reportUrl}?uid=${this._getCookie("mdd_monitor_uid")}`;
     if (this.config.timer) {
