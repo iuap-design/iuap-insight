@@ -323,6 +323,9 @@ class Hubble {
   * 开始录制
   */
   startRecord ({ isEnableScreen = true } = {}) {
+    if(this.isRecording()){
+     return alert('您已开启录制,请关闭录制！')
+    }
     this._setConfig("isEnd", false)
     this._setCookie("mdd_monitor_uid", this._generateUID(), this._getMainHost())
     this._setCookie("mdd_monitor_record", "true", this._getMainHost())
