@@ -17,6 +17,12 @@ var eventLoad = events[0],
 var singleton,
     prototype = 'prototype';
 
+function uuid () {
+    return 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function (c) {
+        const num = parseInt(Math.random() * 16);
+        return num.toString(16);
+    });
+}
 
 export function proxy(proxy) {
     if (singleton) throw "Proxy already exists";
@@ -96,6 +102,7 @@ var RequestHandler = makeHandler(function (rq) {
     for (var key in rq.headers) {
         xhr.setRequestHeader(key, rq.headers[key]);
     }
+    xhr.setRequestHeader("X-traceId", uuid());
     xhr.send(rq.body);
 });
 
