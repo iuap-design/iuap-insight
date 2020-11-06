@@ -507,7 +507,7 @@ UIS.fn.getGeneralInfo = function () {
         remoteMethod: "",
 
         // 应用appid
-        siteId: "",
+        siteId: this.config.siteId,
         pageTitle: window.document.title,
         // 节点URL
         url: window.location.href,
