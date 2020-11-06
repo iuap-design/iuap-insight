@@ -99,7 +99,6 @@ var RequestHandler = makeHandler(function (rq) {
     rq = rq || xhr.config;
     xhr.withCredentials = rq.withCredentials;
     xhr.open(rq.method, rq.url, rq.async !== false, rq.user, rq.password);
-    rq.headers["X-traceId"] = uuid()
     for (var key in rq.headers) {
         xhr.setRequestHeader(key, rq.headers[key]);
     }
@@ -212,6 +211,7 @@ function Proxy(proxy) {
                 // In 'onRequest', we may call XHR's event handler, such as `xhr.onload`.
                 // However, XHR's event handler may not be set until xhr.send is called in
                 // the user's code, so we use `setTimeout` to avoid this situation
+                config.headers["X-traceId"] = uuid();
                 var req = function () {
                     onRequest(config, new RequestHandler(xhr));
                 }
