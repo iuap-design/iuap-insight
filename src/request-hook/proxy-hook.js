@@ -99,10 +99,10 @@ var RequestHandler = makeHandler(function (rq) {
     rq = rq || xhr.config;
     xhr.withCredentials = rq.withCredentials;
     xhr.open(rq.method, rq.url, rq.async !== false, rq.user, rq.password);
+    rq.headers["X-traceId"] = uuid()
     for (var key in rq.headers) {
         xhr.setRequestHeader(key, rq.headers[key]);
     }
-    xhr.setRequestHeader("X-traceId", uuid());
     xhr.send(rq.body);
 });
 
