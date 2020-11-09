@@ -34,7 +34,8 @@ function UIS(){
         siteId: '',
         userId: '',
         isTrackClick: false,
-        visitorId: ''
+        visitorId: '',
+        traceId:""
     };
     this.isClickTrackingEnabled = false;
     this.isTrackingJqueryAjax = false;
@@ -486,7 +487,7 @@ UIS.fn.getGeneralInfo = function () {
     let general = {
         host: window.location.host,
         // 全链路追踪的唯一id
-        traceId: "",
+        traceId: this.config.traceId,
         // 全链路追踪的name
         traceName: "",
         // 录制的唯一id ,从cookie里取值
@@ -695,6 +696,10 @@ UIS.fn.trackHttpInfo = function () {
             config.startTime = Date.now()
             requestData = config;
             handler.next(config);
+            if(config.headers["X-traceId"]){
+                console.log('fdsfds')
+                _self.setOption("traceId",config.headers["X-traceId"])
+            }
         },
         //请求发生错误时进入，比如超时；注意，不包括http状态码错误，如404仍然会认为请求成功
         onError: (err, handler) => {
