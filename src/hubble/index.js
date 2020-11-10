@@ -323,7 +323,7 @@ class Hubble {
   /**
    * 结束录制
    */
-  stopRecord () {
+  stopRecord (obj) {
     let reportUrl = `${this.config.reportUrl}?uid=${this._getCookie("mdd_monitor_uid")}`;
     if (this.config.timer) {
       clearTimeout(this.config.timer)
@@ -336,8 +336,11 @@ class Hubble {
     if (this._getScreenConfig("isEnable")) {
       this._stopRecordScreen()
     }
-
-    window.open(reportUrl)
+    //判断是否打开中间页
+    if(!obj || obj.isOpen){
+      window.open(reportUrl)
+    }
+    
     this._setCookie("mdd_monitor_uid", "", this._getMainHost())
     this._setCookie("mdd_monitor_record", "false", this._getMainHost())
   }
