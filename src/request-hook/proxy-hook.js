@@ -116,7 +116,8 @@ var ErrorHandler = makeHandler(function (error) {
 function Proxy(proxy) {
     var onRequest = proxy.onRequest,
         onResponse = proxy.onResponse,
-        onError = proxy.onError;
+        onError = proxy.onError,
+        blackList = proxy.blackList;
 
     function handleResponse(xhr, xhrProxy) {
         var handler = new ResponseHandler(xhr);
@@ -211,7 +212,20 @@ function Proxy(proxy) {
                 // In 'onRequest', we may call XHR's event handler, such as `xhr.onload`.
                 // However, XHR's event handler may not be set until xhr.send is called in
                 // the user's code, so we use `setTimeout` to avoid this situation
-                config.headers["X-traceId"] = uuid();
+                let url = config.url;
+                //添加X-traceId黑名单
+                var location;
+                if(url.indexOf('.cn')!=-1){
+                    location = url.split('.cn')[1]
+                }else if(url.indexOf('.com')!=-1){
+                    location = url.split('.com')[1]
+                }
+                let isBlack = blackList.filter(item=>(location.indexOf(item))!=-1).length > 0
+                if(!isBlack){
+                    config.headers["X-traceId"] = uuid();
+                }else{
+                    console.log(url,'黑名单')
+                }
                 var req = function () {
                     onRequest(config, new RequestHandler(xhr));
                 }

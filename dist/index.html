@@ -13,12 +13,14 @@
       trackerUrl: "https://developer-test.yonyoucloud.com/iuapInsight/real-time-collect",
       userId:'1511676',
       siteId:'csj',
+      blackList:["/hubble/report/queryRecordHistory"]
     });
 
     $('#app').click(function(e){
       // uis.track(e, 'click_text', '设置的信息')
 
       $.get("https://u8c-daily.yyuap.com")
+      $.get("https://developer-test.yonyoucloud.com/hubble/report/queryRecordHistory?startPage=1&pageSize=15&uid=&userName=&businessScene=")
     })
     
     /**

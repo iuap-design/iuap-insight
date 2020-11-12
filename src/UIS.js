@@ -35,7 +35,8 @@ function UIS(){
         userId: '',
         isTrackClick: false,
         visitorId: '',
-        traceId:""
+        traceId:"",
+        blackList:[]
     };
     this.isClickTrackingEnabled = false;
     this.isTrackingJqueryAjax = false;
@@ -697,7 +698,6 @@ UIS.fn.trackHttpInfo = function () {
             requestData = config;
             handler.next(config);
             if(config.headers["X-traceId"]){
-                console.log('fdsfds')
                 _self.setOption("traceId",config.headers["X-traceId"])
             }
         },
@@ -711,7 +711,8 @@ UIS.fn.trackHttpInfo = function () {
         onResponse: (response, handler) => {
             _self._handleReport(requestData, response)
             handler.next(response)
-        }
+        },
+        blackList:_self.config['blackList']
     })
 }
 
@@ -1018,6 +1019,9 @@ UIS.fn.start = function(params) {
     }
     if (params['isTrackClick']) {
         this.setOption("isTrackClick", params['isTrackClick']);
+    }
+    if (params['blackList'] && params['blackList'].length>0) {
+        this.setOption("blackList", params['blackList']);
     }
 
     // 会统计所有的点击事件，并触发信息提交
