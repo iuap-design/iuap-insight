@@ -215,10 +215,14 @@ function Proxy(proxy) {
                 let url = config.url;
                 //添加X-traceId黑名单
                 var location="";
-                if(url.indexOf('.cn')!=-1){
-                    location = url.split('.cn')[1]
-                }else if(url.indexOf('.com')!=-1){
-                    location = url.split('.com')[1]
+                if((/http|https/g).test(url)){
+                    if(url.indexOf('.cn')!=-1){
+                        location = url.split('.cn')[1]
+                    }else if(url.indexOf('.com')!=-1){
+                        location = url.split('.com')[1]
+                    }
+                }else{
+                    location = url
                 }
                 let isBlack = blackList.filter(item=>(location.indexOf(item))!=-1).length > 0
                 if(!isBlack){
