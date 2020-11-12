@@ -214,7 +214,7 @@ function Proxy(proxy) {
                 // the user's code, so we use `setTimeout` to avoid this situation
                 let url = config.url;
                 //添加X-traceId黑名单
-                var location;
+                var location="";
                 if(url.indexOf('.cn')!=-1){
                     location = url.split('.cn')[1]
                 }else if(url.indexOf('.com')!=-1){

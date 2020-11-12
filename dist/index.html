@@ -13,13 +13,14 @@
       trackerUrl: "https://developer-test.yonyoucloud.com/iuapInsight/real-time-collect",
       userId:'1511676',
       siteId:'csj',
-      blackList:["/hubble/report/queryRecordHistory"]
+      blackList:["/hubble/report/queryRecordHistory","/iform_web/sso/init/iform"]
     });
 
     $('#app').click(function(e){
       // uis.track(e, 'click_text', '设置的信息')
 
       $.get("https://u8c-daily.yyuap.com")
+      $.get('http://dev.nbf.qm.cn/iform_web/sso/init/iform?sysId=diwork&appsource=caep&initType=standardComp&businessKey=c3be098894a7409f83ede4bf56ff60a0')
       $.get("https://developer-test.yonyoucloud.com/hubble/report/queryRecordHistory?startPage=1&pageSize=15&uid=&userName=&businessScene=")
     })
     
