@@ -15,6 +15,9 @@ class Hubble {
       // 录制上报url
       url: "https://developer.yonyoucloud.com/hubble/monitor/record",
 
+      //单点性能测试数据上报
+      singlePointUrl:"https://developer.yonyoucloud.com/hubble/client-perform",
+
       // 中间报告url
       reportUrl: `https://developer.yonyoucloud.com/fe/hubble-new/index.html#/hubble-report`,
 
@@ -91,7 +94,11 @@ class Hubble {
    * 开始录制 结束录制各调用一次
    */
   _toggleRecord () {
-    const recordUrl = `${this.config.url}?uid=${this._getCookie("mdd_monitor_uid")}`;
+    let isDiwork = Object.prototype.toString.call(window.jDiwork) === "[object Object]"
+    && window.jDiwork.getContext
+    && typeof window.jDiwork.getContext === "function";
+
+    let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.origin}`;
     const startId = "hubble_record_script"
 
     let $startScript = document.getElementById(startId)
@@ -122,7 +129,7 @@ class Hubble {
     var Days = 30;
     var exp = new Date();
     exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 30);
-    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + domain + `;path=/`;
+    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + domain + `;path=/` +";SameSite=None;Secure";
   }
 
   /**
@@ -352,6 +359,15 @@ class Hubble {
    */
   isRecording () {
     return this._getCookie("mdd_monitor_record") === "true"
+  }
+
+    /**
+   * 查询开始时间和结束时间
+   */
+  getTimeRange (item) {
+    
+    console.log("单点性能测试开始",item)
+    post(`${this.config.singlePointUrl}`,item,()=>{console.log("上报成功")})
   }
 
 
