@@ -98,7 +98,7 @@ class Hubble {
     && window.jDiwork.getContext
     && typeof window.jDiwork.getContext === "function";
 
-    let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.location.host}`;
+    let recordUrl = `${this.config.url}?uid=${this._getCookie("mdd_monitor_uid")}&isDiwork=${isDiwork}&host=${window.location.host}`;
     const startId = "hubble_record_script"
 
     let $startScript = document.getElementById(startId)
@@ -129,7 +129,7 @@ class Hubble {
     var Days = 30;
     var exp = new Date();
     exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 30);
-    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + domain + `;path=/` +";SameSite=None;Secure";
+    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + domain + `;path=/`;
   }
 
   /**
