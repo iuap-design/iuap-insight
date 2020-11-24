@@ -98,7 +98,7 @@ class Hubble {
     && window.jDiwork.getContext
     && typeof window.jDiwork.getContext === "function";
 
-    let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.location.host}`;
+    let recordUrl = `${this.config.url}?uid=${this._getCookie("mdd_monitor_uid")}&isDiwork=${isDiwork}&host=${window.location.host}`;
     const startId = "hubble_record_script"
 
     let $startScript = document.getElementById(startId)
