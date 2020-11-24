@@ -698,7 +698,6 @@ UIS.fn.trackHttpInfo = function () {
             requestData = config;
             handler.next(config);
             if(config.headers["X-traceId"]){
-                console.log('fdsfds')
                 _self.setOption("traceId",config.headers["X-traceId"])
             }
         },
@@ -724,7 +723,7 @@ UIS.fn._handleReport = function (request = {}, response, err) {
     if (url && url.split("?").length > 1) {
         event.set('httpReqQueryString', url.split("?")[1]);
     }
-    event.set('domainKey',request.headers && request.headers["domain-key"] ? request.["domain-key"] : "");
+    event.set('domainKey',request.headers && request.headers["domain-key"] ? request.headers["domain-key"] : "");
     event.set('host', Utils.getUrlHost(url));
     event.set('httpReqMethod', request.method);
     event.set('httpReqBody', request.body);
