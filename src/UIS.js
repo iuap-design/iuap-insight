@@ -444,6 +444,7 @@ UIS.fn.report = function (data, block, callback) {
         device: this.getDevice(),
         ...data
     }
+    this.setOption("traceId","")
     
     // Utils.post(this.getOption("trackerUrl"), reportData)
     if (navigator.sendBeacon) {
