@@ -305,6 +305,7 @@ class Hubble {
     if (domain) {
       this._setConfig("url", `${domain}/hubble/monitor/record`)
       this._setConfig("reportUrl", `${domain}/fe/hubble-new/index.html#/hubble-report`)
+      this._setConfig("singlePointUrl", `${domain}/hubble/client-perform`)
     }
   }
 
