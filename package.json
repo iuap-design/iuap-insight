@@ -34,7 +34,7 @@
     "webpack-merge": "^5.1.1"
   },
   "dependencies": {
-    "js-base64": "^3.4.4",
+    "js-base64": "2.1.9",
     "moment": "^2.27.0",
     "piwik": "^1.0.6",
     "rrweb": "^0.8.5"
