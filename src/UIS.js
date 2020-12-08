@@ -736,7 +736,7 @@ UIS.fn._handleReport = function (request = {}, response, err) {
 
         if (resSize && resSize <= FourK) {
             event.set('httpResSize', resSize);
-            event.set('httpResBody', response.response);
+            event.set('httpResBody', JSON.stringify(response.response));
         }
     }
 
