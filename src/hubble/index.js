@@ -21,6 +21,8 @@ class Hubble {
 
       // 中间报告url
       reportUrl: `https://developer.yonyoucloud.com/fe/hubble-new/index.html#/hubble-report`,
+      //录制环境
+      env:''
 
     };
 
@@ -115,7 +117,11 @@ class Hubble {
     && window.jDiwork.getContext
     && typeof window.jDiwork.getContext === "function";
 
-    let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.location.host}`;
+    let env = this.config.env;
+    if(!env){
+      env = window.location.host
+    }
+    let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.location.host}&env=${env}`;
     if (userId) {
       recordUrl += `&userId=${userId}`
     }
@@ -322,10 +328,14 @@ class Hubble {
   /**
   * 开始录制
   */
-  startRecord ({ isEnableScreen = true } = {}) {
+  startRecord ({ isEnableScreen = true,env = '' } = {}) {
     this._setConfig("isEnd", false)
     this._setCookie("mdd_monitor_uid", this._generateUID(), this._getMainHost())
     this._setCookie("mdd_monitor_record", "true", this._getMainHost())
+    
+    if(env){
+      this._setConfig("env",env)
+    }
     this._toggleRecord()
 
     this._setScreenConfig("isEnable", !!isEnableScreen)
