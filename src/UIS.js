@@ -616,7 +616,7 @@ UIS.fn.clickEventHandler = function(e, isComstomClickText) {
     }
     // 设置点击时候的信息
     if ( isComstomClickText ) {
-      var click_text_value = uis.getOption('clickText')
+      var click_text_value = this.getOption('clickText')
       click.set('clickText', click_text_value);
     } else {
       click.set('clickText', targ.innerText);
