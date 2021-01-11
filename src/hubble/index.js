@@ -3,6 +3,50 @@
  * Hubble 录制类
  */
 import {post} from '../utils'
+
+//环境枚举值
+const ENVTYPE = [
+  {
+    env:"test",
+    name:"测试环境"
+  },
+  {
+    env:"daily",
+    name:"日常环境"
+  },
+  {
+    env:"pre",
+    name:"预发环境"
+  },
+  {
+    env:"combine",
+    name:"联调环境"
+  },
+  {
+    env:"localhost",
+    name:"本地环境"
+  },
+  {
+    env:"developer.",
+    name:"生产环境"
+  },
+  {
+    env:"diwork.com",
+    name:"生产环境"
+  },
+  {
+    env:"iter",
+    name:"迭代环境"
+  },
+  {
+    env:"yonsuite.yonyou.com",
+    name:"生产环境"
+  },
+  {
+    env:"yonbip.yonyou.com",
+    name:"生产环境"
+  },
+]
 class Hubble {
   constructor() {
 
@@ -119,7 +163,13 @@ class Hubble {
 
     let env = this.config.env;
     if(!env){
-      env = window.location.host
+      env = '未知环境'
+      let host = window.location.host
+      ENVTYPE.forEach((it,index)=>{
+        if(host.indexOf(it.env)!=-1){
+          env = it.name
+        }
+      })
     }
     let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.location.host}&env=${env}`;
     if (userId) {
