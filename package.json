@@ -37,6 +37,7 @@
     "js-base64": "2.1.9",
     "moment": "^2.27.0",
     "piwik": "^1.0.6",
-    "hubble-record": "1.0.0"
+    "hubble-record": "1.0.0",
+    "rrweb": "^0.8.5"
   }
 }
