@@ -141,13 +141,15 @@ class Hubble {
       && window.jDiwork.getContext
       && typeof window.jDiwork.getContext === "function") {
       window.jDiwork.getContext((data) => {
+        let userName = this._getCookie("yonyou_uname")
         let userId = data && data.userid ? data.userid : null
-        this._callRecord(uid, userId)
+        this._callRecord(uid, userId, userName)
       })
     } else {
-      let userId = this._getCookie("userId")
-      if(userId){
-        this._callRecord(uid,userId)
+      let userId = this._getCookie("yonyou_uid")
+      let userName = this._getCookie("yonyou_uname")
+      if(userId && userName){
+        this._callRecord(uid,userId,userName)
       }else{
         this._callRecord(uid)
       }
@@ -157,7 +159,7 @@ class Hubble {
   /**
    * 发起jsonp调用
    */
-  _callRecord (uid = this._getCookie("mdd_monitor_uid"), userId) {
+  _callRecord (uid = this._getCookie("mdd_monitor_uid"), userId,userName) {
     let isDiwork = Object.prototype.toString.call(window.jDiwork) === "[object Object]"
     && window.jDiwork.getContext
     && typeof window.jDiwork.getContext === "function";
@@ -175,6 +177,9 @@ class Hubble {
     let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.location.host}&env=${env}`;
     if (userId) {
       recordUrl += `&userId=${userId}`
+    }
+    if (userName) {
+      recordUrl += `&userName=${userName}`
     }
     const startId = "hubble_record_script"
 
