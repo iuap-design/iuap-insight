@@ -149,7 +149,12 @@ class Hubble {
         this._callRecord(uid, userId)
       })
     } else {
-      this._callRecord(uid)
+      let userId = this._getCookie("userId")
+      if(userId){
+        this._callRecord(uid,userId)
+      }else{
+        this._callRecord(uid)
+      }
     }
   }
 
