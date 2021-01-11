@@ -8,43 +8,39 @@ import {post} from '../utils'
 const ENVTYPE = [
   {
     env:"test",
-    name:"测试环境"
+    name:"test"
   },
   {
     env:"daily",
-    name:"日常环境"
+    name:"daily"
   },
   {
     env:"pre",
-    name:"预发环境"
+    name:"pre"
   },
   {
     env:"combine",
-    name:"联调环境"
-  },
-  {
-    env:"localhost",
-    name:"本地环境"
+    name:"combine"
   },
   {
     env:"developer.",
-    name:"生产环境"
+    name:"online"
   },
   {
     env:"diwork.com",
-    name:"生产环境"
+    name:"online"
   },
   {
     env:"iter",
-    name:"迭代环境"
+    name:"iteration"
   },
   {
     env:"yonsuite.yonyou.com",
-    name:"生产环境"
+    name:"online"
   },
   {
     env:"yonbip.yonyou.com",
-    name:"生产环境"
+    name:"online"
   },
 ]
 class Hubble {
