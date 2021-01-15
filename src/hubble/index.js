@@ -3,6 +3,46 @@
  * Hubble 录制类
  */
 import {post} from '../utils'
+
+//环境枚举值
+const ENVTYPE = [
+  {
+    env:"test",
+    name:"test"
+  },
+  {
+    env:"daily",
+    name:"daily"
+  },
+  {
+    env:"pre",
+    name:"pre"
+  },
+  {
+    env:"combine",
+    name:"combine"
+  },
+  {
+    env:"developer.",
+    name:"online"
+  },
+  {
+    env:"diwork.com",
+    name:"online"
+  },
+  {
+    env:"iter",
+    name:"iteration"
+  },
+  {
+    env:"yonsuite.yonyou.com",
+    name:"online"
+  },
+  {
+    env:"yonbip.yonyou.com",
+    name:"online"
+  },
+]
 class Hubble {
   constructor() {
 
@@ -21,6 +61,8 @@ class Hubble {
 
       // 中间报告url
       reportUrl: `https://developer.yonyoucloud.com/fe/hubble-new/index.html#/hubble-report`,
+      //录制环境
+      env:''
 
     };
 
@@ -99,25 +141,45 @@ class Hubble {
       && window.jDiwork.getContext
       && typeof window.jDiwork.getContext === "function") {
       window.jDiwork.getContext((data) => {
+        let userName = this._getCookie("yonyou_uname")
         let userId = data && data.userid ? data.userid : null
-        this._callRecord(uid, userId)
+        this._callRecord(uid, userId, userName)
       })
     } else {
-      this._callRecord(uid)
+      let userId = this._getCookie("userId")
+      let userName = this._getCookie("userName")
+      if(userId && userName){
+        this._callRecord(uid,userId,userName)
+      }else{
+        this._callRecord(uid)
+      }
     }
   }
 
   /**
    * 发起jsonp调用
    */
-  _callRecord (uid = this._getCookie("mdd_monitor_uid"), userId) {
+  _callRecord (uid = this._getCookie("mdd_monitor_uid"), userId,userName) {
     let isDiwork = Object.prototype.toString.call(window.jDiwork) === "[object Object]"
     && window.jDiwork.getContext
     && typeof window.jDiwork.getContext === "function";
 
-    let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.location.host}`;
+    let env = this.config.env;
+    if(!env){
+      env = '未知环境'
+      let host = window.location.host
+      ENVTYPE.forEach((it,index)=>{
+        if(host.indexOf(it.env)!=-1){
+          env = it.name
+        }
+      })
+    }
+    let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.location.host}&env=${env}`;
     if (userId) {
       recordUrl += `&userId=${userId}`
+    }
+    if (userName) {
+      recordUrl += `&userName=${userName}`
     }
     const startId = "hubble_record_script"
 
@@ -322,10 +384,14 @@ class Hubble {
   /**
   * 开始录制
   */
-  startRecord ({ isEnableScreen = true } = {}) {
+  startRecord ({ isEnableScreen = true,env = '' } = {}) {
     this._setConfig("isEnd", false)
     this._setCookie("mdd_monitor_uid", this._generateUID(), this._getMainHost())
     this._setCookie("mdd_monitor_record", "true", this._getMainHost())
+    
+    if(env){
+      this._setConfig("env",env)
+    }
     this._toggleRecord()
 
     this._setScreenConfig("isEnable", !!isEnableScreen)
