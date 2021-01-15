@@ -23,14 +23,6 @@ const ENVTYPE = [
     name:"combine"
   },
   {
-    env:"developer.",
-    name:"online"
-  },
-  {
-    env:"diwork.com",
-    name:"online"
-  },
-  {
     env:"iter",
     name:"iteration"
   },
