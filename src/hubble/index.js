@@ -211,7 +211,7 @@ class Hubble {
     var Days = 30;
     var exp = new Date();
     exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 30);
-    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + domain +";SameSite=None;Secure";
+    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/" + ";domain=" + domain +";SameSite=None;Secure";
   }
 
   /**
