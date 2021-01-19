@@ -133,8 +133,8 @@ class Hubble {
       && window.jDiwork.getContext
       && typeof window.jDiwork.getContext === "function") {
       window.jDiwork.getContext((data) => {
-        let userName = this._getCookie("yonyou_uname")
         let userId = data && data.userid ? data.userid : null
+        let userName = data && data.username ? data.username : null
         this._callRecord(uid, userId, userName)
       })
     } else {
@@ -158,7 +158,7 @@ class Hubble {
 
     let env = this.config.env;
     if(!env){
-      env = '未知环境'
+      env = 'none'
       let host = window.location.host
       ENVTYPE.forEach((it,index)=>{
         if(host.indexOf(it.env)!=-1){
@@ -203,7 +203,7 @@ class Hubble {
     var Days = 30;
     var exp = new Date();
     exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 30);
-    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + domain +";SameSite=None;Secure";
+    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/" + ";domain=" + domain +";SameSite=None;Secure";
   }
 
   /**
