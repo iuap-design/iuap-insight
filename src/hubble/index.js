@@ -142,7 +142,7 @@ class Hubble {
       && typeof window.jDiwork.getContext === "function") {
       window.jDiwork.getContext((data) => {
         let userId = data && data.userid ? data.userid : null
-        let userName = data && data.userName ? data.userName : null
+        let userName = data && data.username ? data.username : null
         this._callRecord(uid, userId, userName)
       })
     } else {
