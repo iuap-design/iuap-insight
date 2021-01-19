@@ -141,8 +141,8 @@ class Hubble {
       && window.jDiwork.getContext
       && typeof window.jDiwork.getContext === "function") {
       window.jDiwork.getContext((data) => {
-        let userName = this._getCookie("yonyou_uname")
         let userId = data && data.userid ? data.userid : null
+        let userName = data && data.userName ? data.userName : null
         this._callRecord(uid, userId, userName)
       })
     } else {
