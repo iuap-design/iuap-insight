@@ -166,7 +166,7 @@ class Hubble {
 
     let env = this.config.env;
     if(!env){
-      env = '未知环境'
+      env = 'none'
       let host = window.location.host
       ENVTYPE.forEach((it,index)=>{
         if(host.indexOf(it.env)!=-1){
