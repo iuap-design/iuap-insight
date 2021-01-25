@@ -2,6 +2,39 @@
 /**
  * Hubble 录制类
  */
+import {post} from '../utils'
+
+//环境枚举值
+const ENVTYPE = [
+  {
+    env:"test",
+    name:"test"
+  },
+  {
+    env:"daily",
+    name:"daily"
+  },
+  {
+    env:"pre",
+    name:"pre"
+  },
+  {
+    env:"combine",
+    name:"combine"
+  },
+  {
+    env:"iter",
+    name:"iteration"
+  },
+  {
+    env:"yonsuite.yonyou.com",
+    name:"online"
+  },
+  {
+    env:"yonbip.yonyou.com",
+    name:"online"
+  },
+]
 class Hubble {
   constructor() {
 
@@ -20,6 +53,8 @@ class Hubble {
 
       // 中间报告url
       reportUrl: `https://developer.yonyoucloud.com/fe/hubble-new/index.html#/hubble-report`,
+      //录制环境
+      env:''
 
     };
 
@@ -94,11 +129,52 @@ class Hubble {
    * 开始录制 结束录制各调用一次
    */
   _toggleRecord () {
+
+    let uid = this._getCookie("mdd_monitor_uid")
+    if (Object.prototype.toString.call(window.jDiwork) === "[object Object]"
+      && window.jDiwork.getContext
+      && typeof window.jDiwork.getContext === "function") {
+      window.jDiwork.getContext((data) => {
+        let userId = data && data.userid ? data.userid : null
+        let userName = data && data.username ? data.username : null
+        this._callRecord(uid, userId, userName)
+      })
+    } else {
+      let userId = this._getCookie("userId")
+      let userName = this._getCookie("userName")
+      if(userId && userName){
+        this._callRecord(uid,userId,userName)
+      }else{
+        this._callRecord(uid)
+      }
+    }
+  }
+
+  /**
+   * 发起jsonp调用
+   */
+  _callRecord (uid = this._getCookie("mdd_monitor_uid"), userId,userName) {
     let isDiwork = Object.prototype.toString.call(window.jDiwork) === "[object Object]"
     && window.jDiwork.getContext
     && typeof window.jDiwork.getContext === "function";
 
-    let recordUrl = `${this.config.url}?uid=${this._getCookie("mdd_monitor_uid")}&isDiwork=${isDiwork}&host=${window.location.host}`;
+    let env = this.config.env;
+    if(!env){
+      env = 'none'
+      let host = window.location.host
+      ENVTYPE.forEach((it,index)=>{
+        if(host.indexOf(it.env)!=-1){
+          env = it.name
+        }
+      })
+    }
+    let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.location.host}&env=${env}`;
+    if (userId) {
+      recordUrl += `&userId=${userId}`
+    }
+    if (userName) {
+      recordUrl += `&userName=${userName}`
+    }
     const startId = "hubble_record_script"
 
     let $startScript = document.getElementById(startId)
@@ -129,7 +205,7 @@ class Hubble {
     var Days = 30;
     var exp = new Date();
     exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 30);
-    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + domain + `;path=/` +";SameSite=None;Secure";
+    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + `;path=/` +";domain=" + domain +";SameSite=None;Secure";
   }
 
   /**
@@ -146,10 +222,11 @@ class Hubble {
     let urlItems = [];
     // 主域名一定会有两部分组成
     urlItems.unshift(domainList.pop());
+    let mainHost = null;
     // 慢慢从后往前测试
     while (domainList.length) {
       urlItems.unshift(domainList.pop());
-      let mainHost = urlItems.join('.');
+      mainHost = urlItems.join('.');
       let cookie = `${key}=${12345};domain=.${mainHost}`;
 
       document.cookie = cookie;
@@ -160,6 +237,7 @@ class Hubble {
         return mainHost;
       }
     }
+    return mainHost || document.domain
   }
 
 
@@ -196,7 +274,7 @@ class Hubble {
    * 开始录屏
    */
   _startRecordScreen () {
-    if (typeof rrwebRecord === "undefined") return
+    if (!rrwebRecord) return
     let _self = this;
 
     this._screenStopFn = rrwebRecord({
@@ -312,10 +390,14 @@ class Hubble {
   /**
   * 开始录制
   */
-  startRecord ({ isEnableScreen = true } = {}) {
+  startRecord ({ isEnableScreen = true,env = '' } = {}) {
     this._setConfig("isEnd", false)
     this._setCookie("mdd_monitor_uid", this._generateUID(), this._getMainHost())
     this._setCookie("mdd_monitor_record", "true", this._getMainHost())
+    
+    if(env){
+      this._setConfig("env",env)
+    }
     this._toggleRecord()
 
     this._setScreenConfig("isEnable", !!isEnableScreen)
