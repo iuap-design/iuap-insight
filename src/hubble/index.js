@@ -274,7 +274,7 @@ class Hubble {
    * 开始录屏
    */
   _startRecordScreen () {
-    if (!rrwebRecord) return
+    if (typeof rrwebRecord === "undefined") return
     let _self = this;
 
     this._screenStopFn = rrwebRecord({
