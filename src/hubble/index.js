@@ -168,7 +168,7 @@ class Hubble {
         }
       })
     }
-    let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.location.host}`;
+    let recordUrl = `${this.config.url}?uid=${uid}&isDiwork=${isDiwork}&host=${window.location.host}&env=${env}`;
     if (userId) {
       recordUrl += `&userId=${userId}`
     }
