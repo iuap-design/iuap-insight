@@ -78,12 +78,10 @@ class Hubble {
     };
 
 
-    /*
+
     setTimeout(() => {
       this._initScreenScr()
     }, 2000);
-    */
-
   }
 
   _setConfig(key, value) {
