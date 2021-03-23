@@ -54,9 +54,14 @@ class Hubble {
       // 中间报告url
       reportUrl: `https://developer.yonyoucloud.com/fe/hubble-new/index.html#/hubble-report`,
       //录制环境
-      env: ''
+      env: '',
+
+      // 上报js文件
+      recordCDN: "https://yonyoucloud-developer-center-docker-registry.oss-cn-beijing.aliyuncs.com/web/hubble-snapshot-record.js",
 
     };
+
+
 
     // 录屏的config
     this.screenConfig = {
@@ -76,8 +81,6 @@ class Hubble {
       // 录屏上报url
       screenUrl: "https://developer.yonyoucloud.com/screencap/screenDetail.uploadScreenData",
     };
-
-
 
     setTimeout(() => {
       this._initScreenScr()
@@ -269,7 +272,8 @@ class Hubble {
     if (document.getElementById("hubble-snapshot-record")) {
       return
     }
-    var recordCDN = "https://yonyoucloud-developer-center-docker-registry.oss-cn-beijing.aliyuncs.com/web/hubble-snapshot-record.js"
+    // var recordCDN = "https://yonyoucloud-developer-center-docker-registry.oss-cn-beijing.aliyuncs.com/web/hubble-snapshot-record.js"
+    var recordCDN = this.config.recordCDN;
     var snapShotScript = document.createElement("script")
     snapShotScript.id = "hubble-snapshot-record"
     snapShotScript.src = recordCDN
@@ -388,6 +392,8 @@ class Hubble {
   privateInit({ domain = "" }) {
     if (domain) {
       this._setConfig("url", `${domain}/hubble/monitor/record`)
+      this._setScreenConfig("screenUrl", `${domain}/screencap/screenDetail.uploadScreenData`)
+      this._setConfig("recordCDN", `${domain}/fe/lib/hubble-snapshot-record.js`)
       this._setConfig("reportUrl", `${domain}/fe/hubble-new/index.html#/hubble-report`)
       this._setConfig("singlePointUrl", `${domain}/hubble/client-perform`)
     }
