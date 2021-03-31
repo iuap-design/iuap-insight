@@ -50,9 +50,10 @@ export function hook(proxy) {
     // Generate getter for attributes of xhr
     function getterFactory(attr) {
         return function () {
-            var v = this.hasOwnProperty(attr + "_") ? this[attr + "_"] : this.xhr[attr];
-            var attrGetterHook = (proxy[attr] || {})["getter"]
-            return attrGetterHook && attrGetterHook(v, this) || v
+            // var v = this.hasOwnProperty(attr + "_") ? this[attr + "_"] : this.xhr[attr];
+            var v = this.xhr[attr];
+            var attrGetterHook = (proxy[attr] || {})["getter"];
+            return attrGetterHook && attrGetterHook(v, this) || v;
         }
     }
 
