@@ -209,13 +209,12 @@ class Hubble {
   //   document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + `;path=/` +";domain=" + domain +";SameSite=None;Secure";
   // }
 
-  _setCookie(name, value) {
+  _setCookie(name, value, domain) {
     var Days = 30;
     var exp = new Date();
     exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 30);
-    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";";
+    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + `;path=/` + ";domain=" + domain + ";";
   }
-
 
   /**
    * 获取主域名
