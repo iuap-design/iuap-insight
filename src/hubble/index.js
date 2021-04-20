@@ -402,10 +402,12 @@ class Hubble {
     }
     this._toggleRecord()
 
-    this._setScreenConfig("isEnable", !!isEnableScreen)
+    // this._setScreenConfig("isEnable", !!isEnableScreen)   
+    this._setScreenConfig("isEnable", false);  //生产环境注释掉录屏上报
+
     if (!!isEnableScreen) {
       console.log("enable screen")
-      this._startRecordScreen()
+      // this._startRecordScreen() //生产环境注释掉录屏上报
     }
     this.config.timer = setTimeout(() => {
       this._stopByTimer()
